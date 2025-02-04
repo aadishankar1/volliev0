@@ -79,7 +79,7 @@ const Navbar = () => {
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={user.avatar} alt={user.name} />
-                      <AvatarFallback>{user.name[0]}</AvatarFallback>
+                      <AvatarFallback>{user.name}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>

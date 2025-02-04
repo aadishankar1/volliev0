@@ -52,7 +52,7 @@ export default function ProfilePage() {
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setEditedUser({ ...editedUser, [e.target.name]: e.target.value })
+    setEditedUser({ ...editedUser!, [e.target.name]: e.target.value })
   }
 
   const currentLevelXP = user.xp - 100 * (user.level - 1) ** 2
@@ -88,11 +88,11 @@ export default function ProfilePage() {
               <div className="flex items-center space-x-4">
                 <Avatar className="h-20 w-20">
                   <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
-                  <AvatarFallback>{user.name[0]}</AvatarFallback>
+                  <AvatarFallback>{user.name}</AvatarFallback>
                 </Avatar>
                 <div>
                   {isEditing ? (
-                    <Input name="name" value={editedUser.name} onChange={handleChange} className="font-bold text-2xl" />
+                    <Input name="name" value={editedUser?.name} onChange={handleChange} className="font-bold text-2xl" />
                   ) : (
                     <>
                       <h2 className="text-2xl font-bold">{user.name}</h2>
@@ -107,7 +107,7 @@ export default function ProfilePage() {
                   <Textarea
                     id="bio"
                     name="bio"
-                    value={editedUser.bio || ""}
+                    value={editedUser?.bio || ""}
                     onChange={handleChange}
                     rows={4}
                     maxLength={500}
@@ -116,7 +116,7 @@ export default function ProfilePage() {
                   <p>{user.bio || "No bio provided"}</p>
                 )}
                 {isEditing && (
-                  <p className="text-sm text-muted-foreground mt-1">{editedUser.bio?.length || 0}/500 characters</p>
+                  <p className="text-sm text-muted-foreground mt-1">{editedUser?.bio?.length || 0}/500 characters</p>
                 )}
               </div>
               {user.type === "volunteer" && (
@@ -138,7 +138,7 @@ export default function ProfilePage() {
                     <Textarea
                       id="description"
                       name="description"
-                      value={editedUser.description || ""}
+                      value={editedUser?.description || ""}
                       onChange={handleChange}
                       rows={4}
                     />

@@ -7,40 +7,27 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"
-import { useAuth } from '../../context/AuthContext'
+import { useAuth } from '../../../context/AuthContext'
+import { toast } from 'react-toastify';
 
-export default function VolunteerSignUp() {
+export default function OrganizationSignUp() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
+  const [description, setDescription] = useState('')
   const router = useRouter()
-  const { toast } = useToast()
-  const { login } = useAuth()
+  // const { toast } = useToast()
+  const { createUser } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (password !== confirmPassword) {
-      toast({
-        title: "Passwords do not match",
-        description: "Please ensure your passwords match.",
-        variant: "destructive",
-      })
-      return
-    }
     try {
-      await login(email, password, name) // Pass the name here
-      toast({
-        title: "Account created",
-        description: "Your volunteer account has been created successfully.",
-      })
-      router.push('/signup/interests')
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "There was an error creating your account. Please try again.",
-        variant: "destructive",
-      })
+      await createUser({email, password,name,type:'organization'})
+      toast.success( "Your organization account has been created successfully.",
+      )
+      router.push('/profile')
+    } catch (error:any) {
+      toast.error(`Error: ${error.message}`)
     }
   }
 
@@ -48,13 +35,13 @@ export default function VolunteerSignUp() {
     <div className="container mx-auto py-8 pt-20">
       <Card className="w-full max-w-md mx-auto">
         <CardHeader>
-          <CardTitle>Sign Up as Volunteer</CardTitle>
-          <CardDescription>Create your volunteer account</CardDescription>
+          <CardTitle>Sign Up as Organization</CardTitle>
+          <CardDescription>Create an account for your organization</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">Organization Name</Label>
               <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
             </div>
             <div className="space-y-2">
@@ -66,10 +53,10 @@ export default function VolunteerSignUp() {
               <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+              <Label htmlFor="description">Description</Label>
+              <Input id="description" value={description} onChange={(e) => setDescription(e.target.value)} required />
             </div>
-            <Button type="submit" className="w-full">Next</Button>
+            <Button type="submit" className="w-full">Sign Up</Button>
           </form>
         </CardContent>
         <CardFooter className="justify-center">
