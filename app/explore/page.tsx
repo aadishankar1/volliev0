@@ -1,20 +1,34 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { ExploreFilters } from "../components/explore-filters"
-import { CampusOpportunities } from "../components/CampusOpportunities"
-import { Search, MapPin, Calendar, Clock, Users, Share2, Plus } from "lucide-react"
-import Image from "next/image"
-import { useAuth } from "../context/AuthContext"
-import { motion, AnimatePresence } from "framer-motion"
-import { format, isWithinInterval, parseISO } from "date-fns"
-import { useRouter } from "next/navigation"
-import { useToast } from "@/components/ui/use-toast"
+import { useState, useEffect, useCallback } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { ExploreFilters } from "../components/explore-filters";
+import { CampusOpportunities } from "../components/CampusOpportunities";
+import {
+  Search,
+  MapPin,
+  Calendar,
+  Clock,
+  Users,
+  Share2,
+  Plus,
+} from "lucide-react";
+import Image from "next/image";
+import { useAuth } from "../context/AuthContext";
+import { motion, AnimatePresence } from "framer-motion";
+import { format, isWithinInterval, parseISO } from "date-fns";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
 
 // Mock data with real images
 const opportunitiesData = [
@@ -31,7 +45,9 @@ const opportunitiesData = [
     volunteersNeeded: 50,
     currentVolunteers: 30,
     startDate: "2024-04-20",
-    organizationDescription: "UC Berkeley Visitor Services provides campus tours and information to visitors.",
+    endDate: "2024-04-20",
+    organizationDescription:
+      "UC Berkeley Visitor Services provides campus tours and information to visitors.",
     latitude: 37.8719,
     longitude: -122.2585,
     status: "Open",
@@ -40,7 +56,8 @@ const opportunitiesData = [
     id: 2,
     title: "Berkeley Food Pantry Assistant",
     organization: "Berkeley Student Food Collective",
-    description: "Help sort and distribute food to students in need at the UC Berkeley Food Pantry.",
+    description:
+      "Help sort and distribute food to students in need at the UC Berkeley Food Pantry.",
     image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c",
     tags: ["Food Security", "Community Service", "Student Support"],
     location: "UC Berkeley Food Pantry",
@@ -67,7 +84,8 @@ const opportunitiesData = [
     volunteersNeeded: 40,
     currentVolunteers: 25,
     startDate: "2024-11-15",
-    organizationDescription: "Cal Athletics oversees all intercollegiate sports at UC Berkeley.",
+    organizationDescription:
+      "Cal Athletics oversees all intercollegiate sports at UC Berkeley.",
     latitude: 37.8702,
     longitude: -122.2528,
     status: "Open",
@@ -76,7 +94,8 @@ const opportunitiesData = [
     id: 4,
     title: "Library Book Drive",
     organization: "UC Berkeley Libraries",
-    description: "Assist in collecting and sorting book donations for the annual UC Berkeley Library book drive.",
+    description:
+      "Assist in collecting and sorting book donations for the annual UC Berkeley Library book drive.",
     image: "https://images.unsplash.com/photo-1507842217343-583bb7270b66",
     tags: ["Education", "Library", "Book Drive"],
     location: "Doe Library",
@@ -109,7 +128,7 @@ const opportunitiesData = [
     longitude: -122.2596,
     status: "Open",
   },
-]
+];
 
 // Add this to your mock data
 const campusOpportunitiesData = [
@@ -143,81 +162,92 @@ const campusOpportunitiesData = [
     image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018",
     tags: ["Sports", "Event Planning"],
   },
-]
+];
 
 export interface Filters {
-  date: Date | undefined
-  radius: number
-  isVirtual: boolean
-  isCampus: boolean
-  isMultiDay: boolean
+  date: Date | undefined;
+  radius: number;
+  isVirtual: boolean;
+  isCampus: boolean;
+  isMultiDay: boolean;
 }
 
 export function ExplorePage() {
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState<Filters>({
     date: undefined,
     radius: 10,
     isVirtual: false,
     isCampus: false,
     isMultiDay: false,
-  })
-  const [opportunities, setOpportunities] = useState<typeof opportunitiesData>([])
-  const { user, addNotification, signUpForInitiative, fetchInitiatives } = useAuth()
-  const { toast } = useToast()
-  const [selectedOpportunity, setSelectedOpportunity] = useState<(typeof opportunitiesData)[0] | null>(null)
-  const router = useRouter()
+  });
+  const [opportunities, setOpportunities] = useState<typeof opportunitiesData>(
+    []
+  );
+  const { user, addNotification, signUpForInitiative, fetchInitiatives } =
+    useAuth();
+  const { toast } = useToast();
+  const [selectedOpportunity, setSelectedOpportunity] = useState<
+    (typeof opportunitiesData)[0] | null
+  >(null);
+  const router = useRouter();
 
   useEffect(() => {
     // In a real application, you would fetch this data from an API
-    setOpportunities(opportunitiesData)
-  }, [])
+    setOpportunities(opportunitiesData);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await fetchInitiatives()
+        await fetchInitiatives();
       } catch (error) {
-        console.error("Failed to fetch initiatives:", error)
+        console.error("Failed to fetch initiatives:", error);
         toast({
           title: "Error",
           description: "Failed to load initiatives. Please try again later.",
           variant: "destructive",
-        })
+        });
       }
-    }
+    };
 
-    fetchData()
-  }, [fetchInitiatives, toast])
+    fetchData();
+  }, [fetchInitiatives, toast]);
 
   const handleSignUp = useCallback(
     async (opportunity: any) => {
-      if (user?.type !== "volunteer") {
+      if (user?.userType !== 2) {
         toast({
           title: "Sign-up not allowed",
-          description: "Organizations cannot sign up for volunteer opportunities.",
+          description:
+            "Organizations cannot sign up for volunteer opportunities.",
           variant: "destructive",
-        })
-        return
+        });
+        return;
       }
       try {
-        await signUpForInitiative(opportunity.id, opportunity.title, opportunity.organization)
+        await signUpForInitiative(
+          opportunity.id,
+          opportunity.title,
+          opportunity.organization
+        );
         toast({
           title: "Request Sent! 🎉",
           description: `Your request to join "${opportunity.title}" has been sent to ${opportunity.organization}.`,
-        })
-        setSelectedOpportunity(null)
+        });
+        setSelectedOpportunity(null);
       } catch (error) {
-        console.error("Failed to sign up for initiative:", error)
+        console.error("Failed to sign up for initiative:", error);
         toast({
           title: "Error",
-          description: "Failed to sign up for the initiative. Please try again later.",
+          description:
+            "Failed to sign up for the initiative. Please try again later.",
           variant: "destructive",
-        })
+        });
       }
     },
-    [toast, signUpForInitiative, user],
-  )
+    [toast, signUpForInitiative, user]
+  );
 
   const handleShare = useCallback(
     async (opportunity: any) => {
@@ -226,39 +256,54 @@ export function ExplorePage() {
           title: opportunity.title,
           text: `Check out this volunteer opportunity: ${opportunity.title} with ${opportunity.organization}`,
           url: window.location.href,
-        })
+        });
       } catch (err) {
         toast({
           title: "Link Copied! 🔗",
-          description: "The opportunity link has been copied to your clipboard.",
-        })
+          description:
+            "The opportunity link has been copied to your clipboard.",
+        });
       }
     },
-    [toast],
-  )
+    [toast]
+  );
 
   const filteredOpportunities = opportunities.filter((opp) => {
     const matchesSearch =
       opp.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       opp.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      opp.tags?.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      false
+      opp.tags?.some((tag) =>
+        tag.toLowerCase().includes(searchTerm.toLowerCase())
+      ) ||
+      false;
 
-    const matchesVirtual = !filters.isVirtual || opp.location?.toLowerCase().includes("virtual")
-    const matchesCampus = !filters.isCampus || opp.location?.toLowerCase().includes("uc berkeley")
-    const matchesRadius = filters.radius >= calculateDistance(opp.latitude, opp.longitude, 37.8719, -122.2585) // UC Berkeley coordinates
+    const matchesVirtual =
+      !filters.isVirtual || opp.location?.toLowerCase().includes("virtual");
+    const matchesCampus =
+      !filters.isCampus || opp.location?.toLowerCase().includes("uc berkeley");
+    const matchesRadius =
+      filters.radius >=
+      calculateDistance(opp.latitude, opp.longitude, 37.8719, -122.2585); // UC Berkeley coordinates
 
     const matchesDate =
       !filters.date ||
       isWithinInterval(parseISO(opp.startDate), {
         start: filters.date,
         end: new Date(filters.date.getTime() + 24 * 60 * 60 * 1000), // Next day
-      })
+      });
 
-    const matchesMultiDay = !filters.isMultiDay || (opp.endDate && opp.endDate !== opp.startDate)
+    const matchesMultiDay =
+      !filters.isMultiDay || (opp.endDate && opp.endDate !== opp.startDate);
 
-    return matchesSearch && matchesVirtual && matchesCampus && matchesRadius && matchesDate && matchesMultiDay
-  })
+    return (
+      matchesSearch &&
+      matchesVirtual &&
+      matchesCampus &&
+      matchesRadius &&
+      matchesDate &&
+      matchesMultiDay
+    );
+  });
 
   const OpportunityCard = useCallback(
     ({ opportunity }: { opportunity: (typeof opportunitiesData)[0] }) => (
@@ -285,17 +330,22 @@ export function ExplorePage() {
             <h3 className="text-xl font-semibold mb-2 text-vollie-blue">
               {opportunity.title || "Untitled Opportunity"}
             </h3>
-            <p className="text-sm text-muted-foreground mb-2">{opportunity.organization || "Unknown Organization"}</p>
+            <p className="text-sm text-muted-foreground mb-2">
+              {opportunity.organization || "Unknown Organization"}
+            </p>
             <div className="flex items-center text-sm text-muted-foreground mb-2">
               <MapPin className="h-4 w-4 mr-1 text-vollie-green" />
               {opportunity.location || "Location not specified"}
             </div>
             <div className="flex items-center text-sm text-muted-foreground mb-2">
               <Calendar className="h-4 w-4 mr-1 text-vollie-green" />
-              {opportunity.startDate ? format(new Date(opportunity.startDate), "PPP") : "Date not specified"}
-              {opportunity.endDate && opportunity.endDate !== opportunity.startDate && (
-                <> - {format(new Date(opportunity.endDate), "PPP")}</>
-              )}
+              {opportunity.startDate
+                ? format(new Date(opportunity.startDate), "PPP")
+                : "Date not specified"}
+              {opportunity.endDate &&
+                opportunity.endDate !== opportunity.startDate && (
+                  <> - {format(new Date(opportunity.endDate), "PPP")}</>
+                )}
             </div>
             <div className="flex items-center text-sm text-muted-foreground mb-2">
               <Clock className="h-4 w-4 mr-1 text-vollie-green" />
@@ -303,11 +353,16 @@ export function ExplorePage() {
             </div>
             <div className="flex items-center text-sm text-muted-foreground mb-2">
               <Users className="h-4 w-4 mr-1 text-vollie-green" />
-              {opportunity.currentVolunteers || 0} / {opportunity.volunteersNeeded} volunteers
+              {opportunity.currentVolunteers || 0} /{" "}
+              {opportunity.volunteersNeeded} volunteers
             </div>
             <div className="flex flex-wrap gap-2 mt-2">
               {opportunity.tags?.map((tag, index) => (
-                <Badge key={index} variant="secondary" className="bg-vollie-light-blue text-vollie-blue">
+                <Badge
+                  key={index}
+                  variant="secondary"
+                  className="bg-vollie-light-blue text-vollie-blue"
+                >
                   {tag}
                 </Badge>
               )) || <Badge variant="secondary">No tags</Badge>}
@@ -316,8 +371,8 @@ export function ExplorePage() {
         </Card>
       </motion.div>
     ),
-    [],
-  )
+    []
+  );
 
   const handleViewMoreCampusOpportunities = async () => {
     // This is a placeholder function that simulates an API call
@@ -325,10 +380,10 @@ export function ExplorePage() {
     return new Promise<void>((resolve) => {
       setTimeout(() => {
         // When backend is implemented, update this to fetch and add new opportunities
-        resolve()
-      }, 1000) // Simulate a 1-second delay
-    })
-  }
+        resolve();
+      }, 1000); // Simulate a 1-second delay
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background pt-20">
@@ -337,10 +392,14 @@ export function ExplorePage() {
           {/* Header and Search */}
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-vollie-blue">Welcome to Vollie</h1>
-              <p className="mt-2 text-muted-foreground">Volunteering for the Modern Era</p>
+              <h1 className="text-3xl md:text-4xl font-bold text-vollie-blue">
+                Welcome to Vollie
+              </h1>
+              <p className="mt-2 text-muted-foreground">
+                Volunteering for the Modern Era
+              </p>
             </div>
-            {user && user.type === "organization" && (
+            {user && user.userType === 1 && (
               <Button
                 onClick={() => router.push("/add-initiative")}
                 className="bg-vollie-blue hover:bg-vollie-blue/90 text-white"
@@ -384,7 +443,10 @@ export function ExplorePage() {
               {!filters.isCampus && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredOpportunities.map((opportunity) => (
-                    <OpportunityCard key={opportunity.id} opportunity={opportunity} />
+                    <OpportunityCard
+                      key={opportunity.id}
+                      opportunity={opportunity}
+                    />
                   ))}
                 </div>
               )}
@@ -392,8 +454,14 @@ export function ExplorePage() {
           </AnimatePresence>
 
           {/* Opportunity Details Dialog */}
-          <Dialog open={!!selectedOpportunity} onOpenChange={(open) => !open && setSelectedOpportunity(null)}>
-            <DialogContent className="max-w-3xl" aria-describedby="opportunity-description">
+          <Dialog
+            open={!!selectedOpportunity}
+            onOpenChange={(open) => !open && setSelectedOpportunity(null)}
+          >
+            <DialogContent
+              className="max-w-3xl"
+              aria-describedby="opportunity-description"
+            >
               {selectedOpportunity && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -404,7 +472,8 @@ export function ExplorePage() {
                   <DialogHeader>
                     <DialogTitle>{selectedOpportunity.title}</DialogTitle>
                     <DialogDescription id="opportunity-description">
-                      Volunteer opportunity details for {selectedOpportunity.organization}
+                      Volunteer opportunity details for{" "}
+                      {selectedOpportunity.organization}
                     </DialogDescription>
                   </DialogHeader>
                   <div className="relative h-64 w-full mb-6">
@@ -418,12 +487,20 @@ export function ExplorePage() {
                   </div>
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-lg font-semibold mb-2">About the Organization</h3>
-                      <p className="text-muted-foreground">{selectedOpportunity.organizationDescription}</p>
+                      <h3 className="text-lg font-semibold mb-2">
+                        About the Organization
+                      </h3>
+                      <p className="text-muted-foreground">
+                        {selectedOpportunity.organizationDescription}
+                      </p>
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold mb-2">Initiative Details</h3>
-                      <p className="text-muted-foreground">{selectedOpportunity.description}</p>
+                      <h3 className="text-lg font-semibold mb-2">
+                        Initiative Details
+                      </h3>
+                      <p className="text-muted-foreground">
+                        {selectedOpportunity.description}
+                      </p>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="flex items-center gap-2">
@@ -432,11 +509,22 @@ export function ExplorePage() {
                           <h4 className="font-medium">Date</h4>
                           <p className="text-muted-foreground">
                             {selectedOpportunity.startDate
-                              ? format(new Date(selectedOpportunity.startDate), "PPP")
+                              ? format(
+                                  new Date(selectedOpportunity.startDate),
+                                  "PPP"
+                                )
                               : "Not specified"}
                             {selectedOpportunity.endDate &&
-                              selectedOpportunity.endDate !== selectedOpportunity.startDate && (
-                                <> - {format(new Date(selectedOpportunity.endDate), "PPP")}</>
+                              selectedOpportunity.endDate !==
+                                selectedOpportunity.startDate && (
+                                <>
+                                  {" "}
+                                  -{" "}
+                                  {format(
+                                    new Date(selectedOpportunity.endDate),
+                                    "PPP"
+                                  )}
+                                </>
                               )}
                           </p>
                         </div>
@@ -445,14 +533,18 @@ export function ExplorePage() {
                         <Clock className="h-4 w-4 text-muted-foreground" />
                         <div>
                           <h4 className="font-medium">Time Commitment</h4>
-                          <p className="text-muted-foreground">{selectedOpportunity.timeCommitment}</p>
+                          <p className="text-muted-foreground">
+                            {selectedOpportunity.timeCommitment}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-muted-foreground" />
                         <div>
                           <h4 className="font-medium">Location</h4>
-                          <p className="text-muted-foreground">{selectedOpportunity.location}</p>
+                          <p className="text-muted-foreground">
+                            {selectedOpportunity.location}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -460,7 +552,8 @@ export function ExplorePage() {
                         <div>
                           <h4 className="font-medium">Volunteers</h4>
                           <p className="text-muted-foreground">
-                            {selectedOpportunity.currentVolunteers} / {selectedOpportunity.volunteersNeeded} needed
+                            {selectedOpportunity.currentVolunteers} /{" "}
+                            {selectedOpportunity.volunteersNeeded} needed
                           </p>
                         </div>
                       </div>
@@ -475,8 +568,11 @@ export function ExplorePage() {
                   </div>
                   <div className="flex gap-4 mt-6">
                     {user ? (
-                      user.type === "volunteer" ? (
-                        <Button className="flex-1" onClick={() => handleSignUp(selectedOpportunity)}>
+                      user.userType === 2 ? (
+                        <Button
+                          className="flex-1"
+                          onClick={() => handleSignUp(selectedOpportunity)}
+                        >
                           Sign Up Now
                         </Button>
                       ) : (
@@ -485,11 +581,17 @@ export function ExplorePage() {
                         </Button>
                       )
                     ) : (
-                      <Button className="flex-1" onClick={() => router.push("/login")}>
+                      <Button
+                        className="flex-1"
+                        onClick={() => router.push("/login")}
+                      >
                         Log in to join initiatives
                       </Button>
                     )}
-                    <Button variant="outline" onClick={() => handleShare(selectedOpportunity)}>
+                    <Button
+                      variant="outline"
+                      onClick={() => handleShare(selectedOpportunity)}
+                    >
                       <Share2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -500,22 +602,29 @@ export function ExplorePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371 // Radius of the earth in km
-  const dLat = deg2rad(lat2 - lat1)
-  const dLon = deg2rad(lon2 - lon1)
+function calculateDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number {
+  const R = 6371; // Radius of the earth in km
+  const dLat = deg2rad(lat2 - lat1);
+  const dLon = deg2rad(lon2 - lon1);
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2)
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-  const d = R * c // Distance in km
-  return d
+    Math.cos(deg2rad(lat1)) *
+      Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const d = R * c; // Distance in km
+  return d;
 }
 
 function deg2rad(deg: number): number {
-  return deg * (Math.PI / 180)
+  return deg * (Math.PI / 180);
 }
-

@@ -1,98 +1,101 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { createContext, useState, useContext, useEffect } from "react"
-import { useToast } from "@/components/ui/use-toast"
-
+import type React from "react";
+import { createContext, useState, useContext, useEffect } from "react";
+import Cookie from "js-cookie";
+import { getUser, userLogin, userSignup } from "@/services/apiAction/user";
+import { useRouter } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
 type Achievement = {
-  id: string
-  name: string
-  description: string
-  xp: number
-  unlocked: boolean
-  unlockedAt?: Date
-  level: "common" | "rare" | "epic" | "legendary" | "mythic"
-}
+  id: string;
+  name: string;
+  description: string;
+  xp: number;
+  unlocked: boolean;
+  unlockedAt?: Date;
+  level: "common" | "rare" | "epic" | "legendary" | "mythic";
+};
 
 type Challenge = {
-  id: string
-  name: string
-  description: string
-  xp: number
-  completed: boolean
-}
+  id: string;
+  name: string;
+  description: string;
+  xp: number;
+  completed: boolean;
+};
 
 type Quest = {
-  id: string
-  name: string
-  description: string
-  xp: number
-  progress: number
-  total: number
-}
+  id: string;
+  name: string;
+  description: string;
+  xp: number;
+  progress: number;
+  total: number;
+  completed?: boolean;
+};
 
 type UserStats = {
-  hoursVolunteered?: number
-  initiativesCompleted?: number
-  organizationsHelped?: number
-  initiativesCreated?: number
-  totalVolunteerHours?: number
-  volunteersEngaged?: number
-  achievements?: Achievement[]
-  dailyStreak: number
-  lastVolunteerDate: string | null
-  challenges: Challenge[]
-  quests: Quest[]
-}
+  hoursVolunteered?: number;
+  initiativesCompleted?: number;
+  organizationsHelped?: number;
+  initiativesCreated?: number;
+  totalVolunteerHours?: number;
+  volunteersEngaged?: number;
+  achievements?: Achievement[];
+  dailyStreak: number;
+  lastVolunteerDate: string | null;
+  challenges?: Challenge[];
+  quests?: Quest[];
+};
 
 type User = {
-  id: string
-  name: string
-  email: string
-  type: "volunteer" | "organization"
-  bio?: string
-  interests?: string[]
-  description?: string
-  avatar?: string
-  stats?: UserStats
-  darkMode?: boolean
-  emailNotifications?: boolean
-  pushNotifications?: boolean
-  xp: number
-  level: number
-  friends: Friend[]
-  teams: string[]
-  posts: string[]
-  notifications: Notification[]
-  location: string
-  pendingRequests?: PendingRequest[]
-} | null
+  id: string;
+  name: string;
+  email: string;
+  userType: 2 | 1;
+  bio?: string;
+  intrests?: string[];
+  description?: string;
+  avatar?: string;
+  stats?: UserStats;
+  darkMode?: boolean;
+  emailNotifications?: boolean;
+  pushNotifications?: boolean;
+  xp: number;
+  level: number;
+  friends: Friend[];
+  teams: string[];
+  posts: string[];
+  notifications: Notification[];
+  location: string;
+  pendingRequests?: PendingRequest[];
+} | null;
 
 type Opportunity = {
-  id: string
-  title: string
-  organization: string
-  description: string
-  tags: string[]
+  id: string;
+  title: string;
+  organization: string;
+  description: string;
+  tags: string[];
   // Add other relevant fields
-}
+};
 
 type Friend = {
-  id: string
-  name: string
-  avatar: string
-}
+  id: string;
+  name: string;
+  avatar: string;
+};
 
 type Team = {
-  id: string
-  name: string
-  description: string
-  members: string[]
-  createdBy: string
-}
+  id: string;
+  name: string;
+  description: string;
+  members: string[];
+  createdBy: string;
+};
 
 type Notification = {
-  id: string
+  id: string;
   type:
     | "initiative_signup"
     | "achievement_unlocked"
@@ -104,60 +107,72 @@ type Notification = {
     | "signup_declined"
     | "initiative_posted"
     | "initiative_tomorrow"
-    | "initiative_canceled"
-  title: string
-  message: string
-  date: Date
-  read: boolean
-  initiativeId?: string
-  userId?: string
-}
+    | "initiative_canceled";
+  title: string;
+  message: string;
+  date: Date;
+  read: boolean;
+  initiativeId?: string;
+  userId?: string;
+};
 
 type PendingRequest = {
-  id: string
-  title: string
-  organization: string
-  requestDate: string
-}
+  id: string;
+  title: string;
+  organization: string;
+  requestDate: string;
+};
 
 type AuthContextType = {
-  user: User
-  login: (
-    email: string,
-    password: string,
-    name?: string,
-    type?: "volunteer" | "organization",
-    location?: string,
-  ) => Promise<void>
-  logout: () => void
-  updateProfile: (data: Partial<User>) => void
-  loading: boolean
-  getPersonalizedRecommendations: (opportunities: Opportunity[]) => Opportunity[]
-  calculateLevel: (xp: number) => number
-  unlockAchievement: (achievementId: string) => void
-  updateDailyStreak: () => void
-  completeChallenge: (challengeId: string) => void
-  updateQuestProgress: (questId: string, progress: number) => void
-  addFriend: (friendId: string) => void
-  removeFriend: (friendId: string) => void
-  createTeam: (name: string, description: string) => void
-  joinTeam: (teamId: string) => void
-  leaveTeam: (teamId: string) => void
-  addNotification: (notification: Omit<Notification, "id" | "date" | "read">) => void
-  markNotificationAsRead: (notificationId: string) => void
-  signUpForInitiative: (initiativeId: string, initiativeTitle: string, organizationName: string) => void
-  acceptSignUpRequest: (initiativeId: string, userId: string) => void
-  declineSignUpRequest: (initiativeId: string, userId: string) => void
-  fetchInitiatives: () => Promise<void>
-  createInitiative: (initiativeData: any) => Promise<void>
-  updateInitiative: (initiativeId: string, initiativeData: any) => Promise<void>
-  deleteInitiative: (initiativeId: string) => Promise<void>
-  searchInitiatives: (query: string, filters: any) => Promise<void>
-  uploadFile: (file: File) => Promise<string>
-  cancelSignUp: (initiativeId: string) => void
-}
+  user: User;
+  login: (data: {
+    email: string;
+    pass: string;
+    name?: string;
+    userType?: 1 | 2;
+    location?: string;
+  }) => Promise<void>;
+  createUser: (data: any) => Promise<void>;
+  logout: () => void;
+  updateProfile: (data: Partial<User>) => void;
+  loading: boolean;
+  getPersonalizedRecommendations: (
+    opportunities: Opportunity[]
+  ) => Opportunity[];
+  calculateLevel: (xp: number) => number;
+  unlockAchievement: (achievementId: string) => void;
+  updateDailyStreak: () => void;
+  completeChallenge: (challengeId: string) => void;
+  updateQuestProgress: (questId: string, progress: number) => void;
+  addFriend: (friendId: string) => void;
+  removeFriend: (friendId: string) => void;
+  createTeam: (name: string, description: string) => void;
+  joinTeam: (teamId: string) => void;
+  leaveTeam: (teamId: string) => void;
+  addNotification: (
+    notification: Omit<Notification, "id" | "date" | "read">
+  ) => void;
+  markNotificationAsRead: (notificationId: string) => void;
+  signUpForInitiative: (
+    initiativeId: string,
+    initiativeTitle: string,
+    organizationName: string
+  ) => void;
+  acceptSignUpRequest: (initiativeId: string, userId: string) => void;
+  declineSignUpRequest: (initiativeId: string, userId: string) => void;
+  fetchInitiatives: () => Promise<void>;
+  createInitiative: (initiativeData: any) => Promise<void>;
+  updateInitiative: (
+    initiativeId: string,
+    initiativeData: any
+  ) => Promise<void>;
+  deleteInitiative: (initiativeId: string) => Promise<void>;
+  searchInitiatives: (query: string, filters: any) => Promise<void>;
+  uploadFile: (file: File) => Promise<string>;
+  cancelSignUp: (initiativeId: string) => void;
+};
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const defaultVolunteerAchievements: Achievement[] = [
   {
@@ -224,7 +239,7 @@ const defaultVolunteerAchievements: Achievement[] = [
     unlocked: false,
     level: "rare",
   },
-]
+];
 
 const defaultOrganizationAchievements: Achievement[] = [
   {
@@ -291,7 +306,7 @@ const defaultOrganizationAchievements: Achievement[] = [
     unlocked: false,
     level: "rare",
   },
-]
+];
 
 const defaultChallenges: Challenge[] = [
   {
@@ -315,7 +330,7 @@ const defaultChallenges: Challenge[] = [
     xp: 150,
     completed: false,
   },
-]
+];
 
 const defaultQuests: Quest[] = [
   {
@@ -334,115 +349,89 @@ const defaultQuests: Quest[] = [
     progress: 0,
     total: 50,
   },
-]
+];
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User>(null)
-  const [loading, setLoading] = useState(true)
-  const { toast } = useToast()
-
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [user, setUser] = useState<User>(null);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
   useEffect(() => {
-    // Check for saved user data in localStorage
-    const savedUser = localStorage.getItem("user")
-    if (savedUser) {
-      setUser(JSON.parse(savedUser))
-    }
-    setLoading(false)
-  }, [])
+    const accessToken = Cookie.get("accessToken");
+    console.log(user && accessToken, "gfhf");
+    if (!accessToken || user) return;
+    setLoading(true);
+    getUser()
+      .then((user: any) => {
+        setUser(user.res);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLoading(false);
+        console.log(err);
+      });
+  }, []);
 
-  const login = async (
-    email: string,
-    password: string,
-    name?: string,
-    type: "volunteer" | "organization" = "volunteer",
-    location?: string,
-  ) => {
-    // This is a mock login. In a real app, you'd call your API here.
-    const mockUser = {
-      id: "1",
-      name: name || "User",
-      email: email,
-      type: type,
-      bio: "",
-      interests: type === "volunteer" ? ["Education", "Environment"] : [],
-      avatar: "/placeholder.svg",
-      stats:
-        type === "volunteer"
-          ? {
-              hoursVolunteered: 0,
-              initiativesCompleted: 0,
-              organizationsHelped: 0,
-              achievements: defaultVolunteerAchievements,
-              dailyStreak: 0,
-              lastVolunteerDate: null,
-              challenges: defaultChallenges,
-              quests: defaultQuests,
-            }
-          : {
-              initiativesCreated: 0,
-              totalVolunteerHours: 0,
-              volunteersEngaged: 0,
-              achievements: defaultOrganizationAchievements,
-              dailyStreak: 0,
-              lastVolunteerDate: null,
-              challenges: [],
-              quests: [],
-            },
-      darkMode: false,
-      emailNotifications: true,
-      pushNotifications: true,
-      xp: 0,
-      level: 1,
-      friends: [],
-      teams: [],
-      posts: [],
-      notifications: [],
-      location: location || "",
+  const login = async (data: any) => {
+    try {
+      const login = await userLogin(data);
+      if (login.res) Cookie.set("accessToken", login?.res?.token);
+      const user: User = jwtDecode(login.res?.token);
+      setUser(user);
+      router.push("/profile");
+    } catch (err) {
+      throw err;
     }
-    setUser(mockUser)
-    localStorage.setItem("user", JSON.stringify(mockUser))
-  }
+  };
 
   const logout = () => {
-    setUser(null)
-    localStorage.removeItem("user")
-  }
+    setUser(null);
+    Cookie.remove("accessToken");
+    router.push("/login");
+  };
 
   const calculateLevel = (xp: number): number => {
-    return Math.floor(Math.sqrt(xp / 100)) + 1
-  }
+    return Math.floor(Math.sqrt(xp / 100)) + 1;
+  };
 
   const updateProfile = (data: Partial<User>) => {
     if (user) {
-      const updatedUser = { ...user, ...data }
-      if (data.xp !== undefined) {
-        updatedUser.level = calculateLevel(updatedUser.xp)
+      const updatedUser = { ...user, ...data };
+      if (data?.xp !== undefined) {
+        updatedUser.level = calculateLevel(updatedUser.xp);
       }
-      setUser(updatedUser)
-      localStorage.setItem("user", JSON.stringify(updatedUser))
+      setUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
     }
-  }
+  };
 
-  const getPersonalizedRecommendations = (opportunities: Opportunity[]): Opportunity[] => {
-    if (!user || !user.interests) return opportunities
+  const getPersonalizedRecommendations = (
+    opportunities: Opportunity[]
+  ): Opportunity[] => {
+    if (!user || !user.intrests) return opportunities;
 
-    return opportunities.filter((opportunity) => opportunity.tags.some((tag) => user.interests!.includes(tag)))
-  }
+    return opportunities.filter((opportunity) =>
+      opportunity.tags.some((tag) => user.intrests!.includes(tag))
+    );
+  };
 
   const unlockAchievement = (achievementId: string) => {
     if (user && user.stats?.achievements) {
       const updatedAchievements = user.stats.achievements.map((achievement) => {
         if (achievement.id === achievementId && !achievement.unlocked) {
-          return { ...achievement, unlocked: true, unlockedAt: new Date() }
+          return { ...achievement, unlocked: true, unlockedAt: new Date() };
         }
-        return achievement
-      })
+        return achievement;
+      });
 
-      const unlockedAchievement = updatedAchievements.find((a) => a.id === achievementId)
+      const unlockedAchievement = updatedAchievements.find(
+        (a) => a.id === achievementId
+      );
 
       if (unlockedAchievement && !unlockedAchievement.unlocked) {
-        const newXP = user.xp + unlockedAchievement.xp
-        const newLevel = calculateLevel(newXP)
+        const newXP = user.xp + unlockedAchievement.xp;
+        const newLevel = calculateLevel(newXP);
 
         updateProfile({
           stats: {
@@ -451,31 +440,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           },
           xp: newXP,
           level: newLevel,
-        })
+        });
 
         addNotification({
           type: "achievement_unlocked",
           title: "Achievement Unlocked!",
           message: `You've unlocked "${unlockedAchievement.name}" and gained ${unlockedAchievement.xp} XP!`,
-        })
+        });
       }
     }
-  }
+  };
 
   const updateDailyStreak = () => {
     if (user) {
-      const today = new Date().toISOString().split("T")[0]
-      const lastVolunteerDate = user.stats?.lastVolunteerDate
+      const today = new Date().toISOString().split("T")[0];
+      const lastVolunteerDate = user.stats?.lastVolunteerDate;
 
-      if (lastVolunteerDate === today) return
+      if (lastVolunteerDate === today) return;
 
-      const yesterday = new Date()
-      yesterday.setDate(yesterday.getDate() - 1)
-      const yesterdayString = yesterday.toISOString().split("T")[0]
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayString = yesterday.toISOString().split("T")[0];
 
-      let newStreak = 1
+      let newStreak = 1;
       if (lastVolunteerDate === yesterdayString) {
-        newStreak = (user.stats?.dailyStreak || 0) + 1
+        newStreak = (user.stats?.dailyStreak || 0) + 1;
       }
 
       updateProfile({
@@ -484,29 +473,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           dailyStreak: newStreak,
           lastVolunteerDate: today,
         },
-      })
+      });
 
       if (newStreak > 1) {
         addNotification({
           type: "initiative_reminder",
           title: "Daily Streak!",
           message: `You're on a ${newStreak}-day volunteering streak! Keep it up!`,
-        })
+        });
       }
     }
-  }
+  };
 
   const completeChallenge = (challengeId: string) => {
     if (user && user.stats?.challenges) {
       const updatedChallenges = user.stats.challenges.map((challenge) =>
-        challenge.id === challengeId ? { ...challenge, completed: true } : challenge,
-      )
+        challenge.id === challengeId
+          ? { ...challenge, completed: true }
+          : challenge
+      );
 
-      const completedChallenge = updatedChallenges.find((c) => c.id === challengeId)
+      const completedChallenge = updatedChallenges.find(
+        (c) => c.id === challengeId
+      );
 
       if (completedChallenge && !completedChallenge.completed) {
-        const newXP = user.xp + completedChallenge.xp
-        const newLevel = calculateLevel(newXP)
+        const newXP = user.xp + completedChallenge.xp;
+        const newLevel = calculateLevel(newXP);
 
         updateProfile({
           stats: {
@@ -515,54 +508,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           },
           xp: newXP,
           level: newLevel,
-        })
+        });
 
         addNotification({
           type: "achievement_unlocked",
           title: "Challenge Completed!",
           message: `You've completed "${completedChallenge.name}" and earned ${completedChallenge.xp} XP!`,
-        })
+        });
       }
     }
-  }
+  };
 
   const updateQuestProgress = (questId: string, progress: number) => {
     if (user && user.stats?.quests) {
       const updatedQuests = user.stats.quests.map((quest) => {
         if (quest.id === questId) {
-          const newProgress = Math.min(quest.total, quest.progress + progress)
-          const completed = newProgress === quest.total
-          return { ...quest, progress: newProgress, completed }
+          const newProgress = Math.min(quest.total, quest.progress + progress);
+          const completed = newProgress === quest.total;
+          return { ...quest, progress: newProgress, completed };
         }
-        return quest
-      })
+        return quest;
+      });
 
-      const completedQuest = updatedQuests.find((q) => q.id === questId && q.completed)
+      const completedQuest = updatedQuests.find(
+        (q) => q.id === questId && q.completed
+      );
 
       updateProfile({
         stats: {
           ...user.stats,
           quests: updatedQuests,
         },
-      })
+      });
 
       if (completedQuest) {
-        const newXP = user.xp + completedQuest.xp
-        const newLevel = calculateLevel(newXP)
+        const newXP = user.xp + completedQuest.xp;
+        const newLevel = calculateLevel(newXP);
 
         updateProfile({
           xp: newXP,
           level: newLevel,
-        })
+        });
 
         addNotification({
           type: "achievement_unlocked",
           title: "Quest Completed!",
           message: `You've completed "${completedQuest.name}" and earned ${completedQuest.xp} XP!`,
-        })
+        });
       }
     }
-  }
+  };
 
   const addFriend = (friendId: string) => {
     if (user) {
@@ -571,29 +566,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: friendId,
         name: `Friend ${friendId}`,
         avatar: "/placeholder.svg",
-      }
+      };
       updateProfile({
         friends: [...user.friends, newFriend],
-      })
+      });
       addNotification({
         type: "friend_request",
         title: "New Friend Added",
         message: `You are now friends with ${newFriend.name}.`,
-      })
+      });
     }
-  }
+  };
 
   const removeFriend = (friendId: string) => {
     if (user) {
-      const updatedFriends = user.friends.filter((friend) => friend.id !== friendId)
-      updateProfile({ friends: updatedFriends })
+      const updatedFriends = user.friends.filter(
+        (friend) => friend.id !== friendId
+      );
+      updateProfile({ friends: updatedFriends });
       addNotification({
         type: "friend_request",
         title: "Friend Removed",
         message: "The friend has been removed from your list.",
-      })
+      });
     }
-  }
+  };
 
   const createTeam = (name: string, description: string) => {
     if (user) {
@@ -603,93 +600,101 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description,
         members: [user.id],
         createdBy: user.id,
-      }
+      };
       // In a real app, you'd store this team data on the server
       updateProfile({
         teams: [...user.teams, newTeam.id],
-      })
+      });
       addNotification({
         type: "team_invite",
         title: "Team Created",
         message: `Your team "${name}" has been successfully created.`,
-      })
+      });
     }
-  }
+  };
 
   const joinTeam = (teamId: string) => {
     if (user) {
       updateProfile({
         teams: [...user.teams, teamId],
-      })
+      });
       addNotification({
         type: "team_invite",
         title: "Team Joined",
         message: "You have successfully joined the team.",
-      })
+      });
     }
-  }
+  };
 
   const leaveTeam = (teamId: string) => {
     if (user) {
-      const updatedTeams = user.teams.filter((id) => id !== teamId)
-      updateProfile({ teams: updatedTeams })
+      const updatedTeams = user.teams.filter((id) => id !== teamId);
+      updateProfile({ teams: updatedTeams });
       addNotification({
         type: "team_invite",
         title: "Team Left",
         message: "You have left the team.",
-      })
+      });
     }
-  }
+  };
 
-  const addNotification = (notification: Omit<Notification, "id" | "date" | "read">) => {
+  const addNotification = (
+    notification: Omit<Notification, "id" | "date" | "read">
+  ) => {
     if (user) {
       const newNotification: Notification = {
         ...notification,
         id: Date.now().toString(),
         date: new Date(),
         read: false,
-      }
+      };
       updateProfile({
         notifications: [newNotification, ...user.notifications],
-      })
+      });
     }
-  }
+  };
 
   const markNotificationAsRead = (notificationId: string) => {
     if (user) {
       const updatedNotifications = user.notifications.map((notification) =>
-        notification.id === notificationId ? { ...notification, read: true } : notification,
-      )
+        notification.id === notificationId
+          ? { ...notification, read: true }
+          : notification
+      );
       updateProfile({
         notifications: updatedNotifications,
-      })
+      });
     }
-  }
+  };
 
-  const signUpForInitiative = (initiativeId: string, initiativeTitle: string, organizationName: string) => {
-    if (user && user.type === "volunteer") {
+  const signUpForInitiative = (
+    initiativeId: string,
+    initiativeTitle: string,
+    organizationName: string
+  ) => {
+    if (user && user.userType === 2) {
       const newRequest: PendingRequest = {
         id: initiativeId,
         title: initiativeTitle,
         organization: organizationName,
         requestDate: new Date().toISOString(),
-      }
+      };
 
       updateProfile({
         pendingRequests: [...(user.pendingRequests || []), newRequest],
-      })
+      });
 
       addNotification({
         type: "signup_request",
         title: "Initiative Sign-up Request Sent",
         message: `Your request to join "${initiativeTitle}" has been sent to ${organizationName}.`,
         initiativeId,
-      })
+      });
     }
-  }
+  };
 
   const acceptSignUpRequest = (initiativeId: string, userId: string) => {
-    if (user && user.type === "organization") {
+    if (user && user.userType === 1) {
       // In a real app, you'd update the initiative's participants on the server
       addNotification({
         type: "signup_accepted",
@@ -697,77 +702,96 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         message: `You've accepted the sign-up request for initiative ${initiativeId} from user ${userId}.`,
         initiativeId,
         userId,
-      })
+      });
       // Notify the volunteer that their request was accepted
     }
-  }
+  };
 
   const declineSignUpRequest = (initiativeId: string, userId: string) => {
-    if (user && user.type === "organization") {
+    if (user && user.userType === 1) {
       addNotification({
         type: "signup_declined",
         title: "Sign-up Request Declined",
         message: `You've declined the sign-up request for initiative ${initiativeId} from user ${userId}.`,
         initiativeId,
         userId,
-      })
+      });
       // Notify the volunteer that their request was declined
     }
-  }
+  };
 
   const fetchInitiatives = async () => {
     // TODO: Implement API call to fetch initiatives
-  }
+  };
 
   const createInitiative = async (initiativeData: any) => {
     // TODO: Implement API call to create an initiative
-  }
+  };
 
-  const updateInitiative = async (initiativeId: string, initiativeData: any) => {
+  const updateInitiative = async (
+    initiativeId: string,
+    initiativeData: any
+  ) => {
     // TODO: Implement API call to update an initiative
-  }
+  };
 
   const deleteInitiative = async (initiativeId: string) => {
     // TODO: Implement API call to delete an initiative
-  }
+  };
 
   const searchInitiatives = async (query: string, filters: any) => {
     // TODO: Implement API call to search initiatives
-  }
+  };
 
   const uploadFile = async (file: File) => {
     // TODO: Implement API call to upload a file
-    return "https://example.com/uploaded-file.jpg" // Placeholder return
-  }
+    return "https://example.com/uploaded-file.jpg"; // Placeholder return
+  };
 
   const cancelSignUp = (initiativeId: string) => {
     if (user) {
-      const updatedPendingRequests = user.pendingRequests?.filter((request) => request.id !== initiativeId)
+      const updatedPendingRequests = user.pendingRequests?.filter(
+        (request) => request.id !== initiativeId
+      );
 
       const updatedNotifications = user.notifications.filter(
-        (notification) => !(notification.type === "signup_request" && notification.initiativeId === initiativeId),
-      )
+        (notification) =>
+          !(
+            notification.type === "signup_request" &&
+            notification.initiativeId === initiativeId
+          )
+      );
 
       updateProfile({
         pendingRequests: updatedPendingRequests,
         notifications: updatedNotifications,
-      })
+      });
 
       addNotification({
         type: "initiative_canceled",
         title: "Sign-up Request Canceled",
         message: `You have canceled your sign-up request for initiative ${initiativeId}.`,
         initiativeId,
-      })
+      });
     }
-  }
-
+  };
+  const createUser = async (data: any): Promise<void> => {
+    try {
+      const user = await userSignup(data);
+      if (user.res) Cookie.set("accessToken", user?.res?.token);
+      const createdUser: User = jwtDecode(user.res?.token);
+      setUser(createdUser);
+    } catch (err) {
+      throw err;
+    }
+  };
   return (
     <AuthContext.Provider
       value={{
         user,
         login,
         logout,
+        createUser,
         updateProfile,
         loading,
         getPersonalizedRecommendations,
@@ -797,14 +821,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     >
       {children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
 
 export const useAuth = () => {
-  const context = useContext(AuthContext)
+  const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
+    throw new Error("useAuth must be used within an AuthProvider");
   }
-  return context
-}
-
+  return context;
+};

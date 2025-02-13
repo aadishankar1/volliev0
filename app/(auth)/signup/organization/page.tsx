@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"
-import { useAuth } from "../../context/AuthContext"
+import { useAuth } from "../../../context/AuthContext"
+import { toast } from "react-toastify";
 
 export default function OrganizationSignUp() {
   const [name, setName] = useState("")
@@ -15,25 +16,20 @@ export default function OrganizationSignUp() {
   const [password, setPassword] = useState("")
   const [location, setLocation] = useState("")
   const router = useRouter()
-  const { toast } = useToast()
-  const { login } = useAuth()
+  // const { toast } = useToast()
+  const { createUser } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    try {
-      await login(email, password, name, "organization", location)
-      toast({
-        title: "Account created",
-        description: "Your organization account has been created successfully.",
-      })
-      router.push("/signup/interests")
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "There was an error creating your account. Please try again.",
-        variant: "destructive",
-      })
-    }
+  
+      try {
+        // await createUser({email, password,name,type:'organization'})
+        await createUser({ email, pass: password, name, userType: 1 });
+        toast.success("Your organization account has been created successfully.");
+        router.push("/profile");
+      } catch (error: any) {
+        toast.error(`Error: ${error.message}`);
+      }
   }
 
   return (

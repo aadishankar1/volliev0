@@ -2,35 +2,29 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../../context/AuthContext'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"
+import { toast } from "react-toastify";
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const router = useRouter()
-  const { toast } = useToast()
+  // const { toast } = useToast()
   const { login } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      await login(email, password)
-      toast({
-        title: "Logged in",
-        description: "You have been successfully logged in.",
-      })
-      router.push('/profile')
-    } catch (error) {
-      toast({
-        title: "Login failed",
-        description: "Please check your credentials and try again.",
-        variant: "destructive",
-      })
+      const a=await login({ email, pass: password });
+      toast.success("You have been successfully logged in.");
+      router.push("/profile");
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`);
     }
   }
 

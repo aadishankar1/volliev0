@@ -1,18 +1,33 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Pencil, Check, X, Upload, Clock, Briefcase, Award, Star } from "lucide-react"
-import { useAuth } from "../context/AuthContext"
-import { useToast } from "@/components/ui/use-toast"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import {
+  Pencil,
+  Check,
+  X,
+  Upload,
+  Clock,
+  Briefcase,
+  Award,
+  Star,
+} from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
 
 const INTERESTS = [
   "Education",
@@ -29,7 +44,7 @@ const INTERESTS = [
   "Elderly Care",
   "Sports",
   "Mental Health",
-]
+];
 
 const organizationAchievements = [
   {
@@ -60,92 +75,101 @@ const organizationAchievements = [
     xp: 1000,
     unlocked: false,
   },
-]
+];
 
 export default function ProfilePage() {
-  const { user, updateProfile, loading } = useAuth()
-  const router = useRouter()
-  const [isEditing, setIsEditing] = useState(false)
-  const [editedUser, setEditedUser] = useState(user)
-  const [newProfileImage, setNewProfileImage] = useState<File | null>(null)
-  const { toast } = useToast()
+  const { user, updateProfile, loading } = useAuth();
+  const router = useRouter();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedUser, setEditedUser] = useState(user);
+  const [newProfileImage, setNewProfileImage] = useState<File | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/login")
+      router.push("/login");
     } else if (user) {
-      setEditedUser(user)
+      setEditedUser(user);
     }
-  }, [user, loading, router])
+  }, [user, loading, router]);
 
   if (loading) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   if (!user) {
-    return null
+    return null;
   }
 
   const handleEdit = () => {
-    setIsEditing(true)
-  }
+    setIsEditing(true);
+  };
 
   const handleCancel = () => {
-    setIsEditing(false)
-    setEditedUser(user)
-    setNewProfileImage(null)
-  }
+    setIsEditing(false);
+    setEditedUser(user);
+    setNewProfileImage(null);
+  };
 
   const handleSave = async () => {
-    let imageUrl = user.avatar
+    let imageUrl = user.avatar;
 
     if (newProfileImage) {
       // In a real application, you would upload the image to a server and get a URL back
       // For this example, we'll just create a local object URL
-      imageUrl = URL.createObjectURL(newProfileImage)
+      imageUrl = URL.createObjectURL(newProfileImage);
     }
 
     const updatedUser = {
       ...editedUser,
       avatar: imageUrl,
-    }
+    };
 
-    await updateProfile(updatedUser)
-    setIsEditing(false)
+    await updateProfile(updatedUser);
+    setIsEditing(false);
     toast({
       title: "Profile Updated",
       description: "Your profile has been successfully updated.",
-    })
-  }
+    });
+  };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setEditedUser({ ...editedUser, [e.target.name]: e.target.value })
-  }
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    editedUser &&
+      setEditedUser({ ...editedUser, [e.target.name]: e.target.value });
+  };
 
   const handleInterestChange = (interest: string) => {
-    const updatedInterests = editedUser.interests?.includes(interest)
-      ? editedUser.interests.filter((i) => i !== interest)
-      : [...(editedUser.interests || []), interest]
-    setEditedUser({ ...editedUser, interests: updatedInterests })
-  }
+    const updatedInterests = editedUser?.intrests?.includes(interest)
+      ? editedUser.intrests.filter((i) => i !== interest)
+      : [...(editedUser?.intrests || []), interest];
+    editedUser && setEditedUser({ ...editedUser, intrests: updatedInterests });
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setNewProfileImage(e.target.files[0])
+      setNewProfileImage(e.target.files[0]);
     }
-  }
+  };
 
-  const currentLevelXP = user.xp - 100 * (user.level - 1) ** 2
-  const nextLevelXP = 100 * user.level ** 2
-  const xpProgress = (currentLevelXP / (nextLevelXP - 100 * (user.level - 1) ** 2)) * 100
+  const currentLevelXP = user.xp - 100 * (user.level - 1) ** 2;
+  const nextLevelXP = 100 * user.level ** 2;
+  const xpProgress =
+    (currentLevelXP / (nextLevelXP - 100 * (user.level - 1) ** 2)) * 100;
 
   return (
     <div className="container mx-auto py-8 pt-20 dark:text-gray-200">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold text-vollie-blue dark:text-vollie-blue">Your Profile</h1>
+        <h1 className="text-4xl font-bold text-vollie-blue dark:text-vollie-blue">
+          Your Profile
+        </h1>
         {isEditing ? (
           <div className="space-x-2">
-            <Button onClick={handleSave} className="bg-green-500 hover:bg-green-600">
+            <Button
+              onClick={handleSave}
+              className="bg-green-500 hover:bg-green-600"
+            >
               <Check className="mr-2 h-4 w-4" />
               Save
             </Button>
@@ -165,7 +189,11 @@ export default function ProfilePage() {
       <div className="grid gap-6 md:grid-cols-2">
         <Card className="dark:bg-gray-800">
           <CardHeader>
-            <CardTitle>{user.type === "organization" ? "Organization Information" : "Personal Information"}</CardTitle>
+            <CardTitle>
+              {user.userType === 1
+                ? "Organization Information"
+                : "Personal Information"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -173,7 +201,11 @@ export default function ProfilePage() {
                 <div className="relative">
                   <Avatar className="h-20 w-20">
                     <AvatarImage
-                      src={newProfileImage ? URL.createObjectURL(newProfileImage) : user.avatar || "/placeholder.svg"}
+                      src={
+                        newProfileImage
+                          ? URL.createObjectURL(newProfileImage)
+                          : user.avatar || "/placeholder.svg"
+                      }
                       alt={user.name}
                     />
                     <AvatarFallback>{user.name[0]}</AvatarFallback>
@@ -199,19 +231,23 @@ export default function ProfilePage() {
                   {isEditing ? (
                     <Input
                       name="name"
-                      value={editedUser.name}
+                      value={editedUser?.name}
                       onChange={handleChange}
                       className="font-bold text-2xl dark:text-gray-200"
                     />
                   ) : (
                     <>
-                      <h2 className="text-2xl font-bold dark:text-gray-200">{user.name}</h2>
-                      <p className="text-muted-foreground dark:text-gray-200">{user.email}</p>
+                      <h2 className="text-2xl font-bold dark:text-gray-200">
+                        {user.name}
+                      </h2>
+                      <p className="text-muted-foreground dark:text-gray-200">
+                        {user.email}
+                      </p>
                     </>
                   )}
                 </div>
               </div>
-              {user.type !== "organization" && (
+              {user.userType !== 1 && (
                 <div>
                   <Label htmlFor="bio" className="dark:text-gray-200">
                     Bio
@@ -220,23 +256,25 @@ export default function ProfilePage() {
                     <Textarea
                       id="bio"
                       name="bio"
-                      value={editedUser.bio || ""}
+                      value={editedUser?.bio || ""}
                       onChange={handleChange}
                       rows={4}
                       maxLength={500}
                       className="dark:text-gray-200"
                     />
                   ) : (
-                    <p className="dark:text-gray-200">{user.bio || "No bio provided"}</p>
+                    <p className="dark:text-gray-200">
+                      {user.bio || "No bio provided"}
+                    </p>
                   )}
                   {isEditing && (
                     <p className="text-sm text-muted-foreground dark:text-gray-200 mt-1">
-                      {editedUser.bio?.length || 0}/500 characters
+                      {editedUser?.bio?.length || 0}/500 characters
                     </p>
                   )}
                 </div>
               )}
-              {user.type === "organization" && (
+              {user.userType === 1 && (
                 <div>
                   <Label htmlFor="description" className="dark:text-gray-200">
                     Organization Description
@@ -245,18 +283,20 @@ export default function ProfilePage() {
                     <Textarea
                       id="description"
                       name="description"
-                      value={editedUser.description || ""}
+                      value={editedUser?.description || ""}
                       onChange={handleChange}
                       rows={4}
                       maxLength={500}
                       className="dark:text-gray-200"
                     />
                   ) : (
-                    <p className="dark:text-gray-200">{user.description || "No description provided"}</p>
+                    <p className="dark:text-gray-200">
+                      {user.description || "No description provided"}
+                    </p>
                   )}
                   {isEditing && (
                     <p className="text-sm text-muted-foreground dark:text-gray-200 mt-1">
-                      {editedUser.description?.length || 0}/500 characters
+                      {editedUser?.description?.length || 0}/500 characters
                     </p>
                   )}
                 </div>
@@ -270,7 +310,11 @@ export default function ProfilePage() {
                     {INTERESTS.map((interest) => (
                       <Badge
                         key={interest}
-                        variant={editedUser.interests?.includes(interest) ? "default" : "outline"}
+                        variant={
+                          editedUser?.intrests?.includes(interest)
+                            ? "default"
+                            : "outline"
+                        }
                         className="cursor-pointer"
                         onClick={() => handleInterestChange(interest)}
                       >
@@ -280,8 +324,12 @@ export default function ProfilePage() {
                   </div>
                 ) : (
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {user.interests?.map((interest, index) => (
-                      <Badge key={index} variant="secondary" className="dark:text-gray-200">
+                    {user.intrests?.map((interest, index) => (
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="dark:text-gray-200"
+                      >
                         {interest}
                       </Badge>
                     ))}
@@ -294,44 +342,72 @@ export default function ProfilePage() {
 
         <Card className="dark:bg-gray-800">
           <CardHeader>
-            <CardTitle>{user.type === "volunteer" ? "Volunteering Stats" : "Organization Stats"}</CardTitle>
+            <CardTitle>
+              {user.userType === 2
+                ? "Volunteering Stats"
+                : "Organization Stats"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-3 gap-4 text-center">
-              {user.type === "volunteer" ? (
+              {user.userType === 2 ? (
                 <>
                   <div>
                     <Clock className="h-8 w-8 mx-auto mb-2 text-primary" />
-                    <div className="text-2xl font-bold dark:text-gray-200">{user.stats?.hoursVolunteered || 0}</div>
-                    <div className="text-sm text-muted-foreground dark:text-gray-200">Hours</div>
+                    <div className="text-2xl font-bold dark:text-gray-200">
+                      {user.stats?.hoursVolunteered || 0}
+                    </div>
+                    <div className="text-sm text-muted-foreground dark:text-gray-200">
+                      Hours
+                    </div>
                   </div>
                   <div>
                     <Briefcase className="h-8 w-8 mx-auto mb-2 text-primary" />
-                    <div className="text-2xl font-bold dark:text-gray-200">{user.stats?.initiativesCompleted || 0}</div>
-                    <div className="text-sm text-muted-foreground dark:text-gray-200">Initiatives</div>
+                    <div className="text-2xl font-bold dark:text-gray-200">
+                      {user.stats?.initiativesCompleted || 0}
+                    </div>
+                    <div className="text-sm text-muted-foreground dark:text-gray-200">
+                      Initiatives
+                    </div>
                   </div>
                   <div>
                     <Award className="h-8 w-8 mx-auto mb-2 text-primary" />
-                    <div className="text-2xl font-bold dark:text-gray-200">{user.stats?.organizationsHelped || 0}</div>
-                    <div className="text-sm text-muted-foreground dark:text-gray-200">Organizations</div>
+                    <div className="text-2xl font-bold dark:text-gray-200">
+                      {user.stats?.organizationsHelped || 0}
+                    </div>
+                    <div className="text-sm text-muted-foreground dark:text-gray-200">
+                      Organizations
+                    </div>
                   </div>
                 </>
               ) : (
                 <>
                   <div>
                     <Briefcase className="h-8 w-8 mx-auto mb-2 text-primary" />
-                    <div className="text-2xl font-bold dark:text-gray-200">{user.stats?.initiativesCreated || 0}</div>
-                    <div className="text-sm text-muted-foreground dark:text-gray-200">Initiatives</div>
+                    <div className="text-2xl font-bold dark:text-gray-200">
+                      {user.stats?.initiativesCreated || 0}
+                    </div>
+                    <div className="text-sm text-muted-foreground dark:text-gray-200">
+                      Initiatives
+                    </div>
                   </div>
                   <div>
                     <Clock className="h-8 w-8 mx-auto mb-2 text-primary" />
-                    <div className="text-2xl font-bold dark:text-gray-200">{user.stats?.totalVolunteerHours || 0}</div>
-                    <div className="text-sm text-muted-foreground dark:text-gray-200">Volunteer Hours</div>
+                    <div className="text-2xl font-bold dark:text-gray-200">
+                      {user.stats?.totalVolunteerHours || 0}
+                    </div>
+                    <div className="text-sm text-muted-foreground dark:text-gray-200">
+                      Volunteer Hours
+                    </div>
                   </div>
                   <div>
                     <Award className="h-8 w-8 mx-auto mb-2 text-primary" />
-                    <div className="text-2xl font-bold dark:text-gray-200">{user.stats?.volunteersEngaged || 0}</div>
-                    <div className="text-sm text-muted-foreground dark:text-gray-200">Volunteers</div>
+                    <div className="text-2xl font-bold dark:text-gray-200">
+                      {user.stats?.volunteersEngaged || 0}
+                    </div>
+                    <div className="text-sm text-muted-foreground dark:text-gray-200">
+                      Volunteers
+                    </div>
                   </div>
                 </>
               )}
@@ -340,7 +416,7 @@ export default function ProfilePage() {
         </Card>
       </div>
 
-      {user.type === "volunteer" && (
+      {user.userType === 1 && (
         <Card className="mt-6 dark:bg-gray-800">
           <CardHeader>
             <CardTitle>Level Progress</CardTitle>
@@ -349,11 +425,18 @@ export default function ProfilePage() {
             <div className="flex items-center space-x-4 mb-4">
               <Star className="h-8 w-8 text-yellow-500" />
               <div>
-                <div className="text-2xl font-bold dark:text-gray-200">Level {user.level}</div>
-                <div className="text-sm text-muted-foreground dark:text-gray-200">{user.xp} XP total</div>
+                <div className="text-2xl font-bold dark:text-gray-200">
+                  Level {user.level}
+                </div>
+                <div className="text-sm text-muted-foreground dark:text-gray-200">
+                  {user.xp} XP total
+                </div>
               </div>
             </div>
-            <Progress value={xpProgress} className="w-full h-2 mb-2 dark:bg-gray-600" />
+            <Progress
+              value={xpProgress}
+              className="w-full h-2 mb-2 dark:bg-gray-600"
+            />
             <div className="flex justify-between text-sm text-muted-foreground dark:text-gray-200">
               <span>{currentLevelXP} XP</span>
               <span>{nextLevelXP - currentLevelXP} XP to next level</span>
@@ -362,11 +445,13 @@ export default function ProfilePage() {
         </Card>
       )}
 
-      {user.type === "volunteer" && user.stats?.achievements && (
+      {user.userType === 2 && user.stats?.achievements && (
         <Card className="mt-6 dark:bg-gray-800">
           <CardHeader>
             <CardTitle>Achievements</CardTitle>
-            <CardDescription>Track your volunteering milestones</CardDescription>
+            <CardDescription>
+              Track your volunteering milestones
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -374,16 +459,27 @@ export default function ProfilePage() {
                 <div
                   key={achievement.id}
                   className={`p-4 border rounded-lg ${
-                    achievement.unlocked ? "bg-primary/10 dark:bg-primary/30" : "bg-gray-100 dark:bg-gray-700"
+                    achievement.unlocked
+                      ? "bg-primary/10 dark:bg-primary/30"
+                      : "bg-gray-100 dark:bg-gray-700"
                   }`}
                 >
-                  <h3 className="font-semibold mb-2 dark:text-gray-200">{achievement.name}</h3>
-                  <p className="text-sm text-muted-foreground dark:text-gray-200 mb-2">{achievement.description}</p>
+                  <h3 className="font-semibold mb-2 dark:text-gray-200">
+                    {achievement.name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground dark:text-gray-200 mb-2">
+                    {achievement.description}
+                  </p>
                   <div className="flex justify-between items-center">
-                    <Badge variant={achievement.unlocked ? "default" : "secondary"} className="dark:text-gray-200">
+                    <Badge
+                      variant={achievement.unlocked ? "default" : "secondary"}
+                      className="dark:text-gray-200"
+                    >
                       {achievement.unlocked ? "Unlocked" : "Locked"}
                     </Badge>
-                    <span className="text-sm font-medium dark:text-gray-200">{achievement.xp} XP</span>
+                    <span className="text-sm font-medium dark:text-gray-200">
+                      {achievement.xp} XP
+                    </span>
                   </div>
                 </div>
               ))}
@@ -392,11 +488,13 @@ export default function ProfilePage() {
         </Card>
       )}
 
-      {user.type === "organization" && (
+      {user.userType === 1 && (
         <Card className="mt-6 dark:bg-gray-800">
           <CardHeader>
             <CardTitle>Recent Achievements</CardTitle>
-            <CardDescription>Track your organization's impact milestones</CardDescription>
+            <CardDescription>
+              Track your organization's impact milestones
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2">
@@ -408,17 +506,24 @@ export default function ProfilePage() {
                   </CardHeader>
                   <CardContent>
                     <div className="flex justify-between items-center">
-                      <Badge variant={achievement.unlocked ? "default" : "secondary"}>
+                      <Badge
+                        variant={achievement.unlocked ? "default" : "secondary"}
+                      >
                         {achievement.unlocked ? "Unlocked" : "Locked"}
                       </Badge>
-                      <span className="text-sm font-medium">{achievement.xp} XP</span>
+                      <span className="text-sm font-medium">
+                        {achievement.xp} XP
+                      </span>
                     </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
             <div className="mt-4 text-center">
-              <Button onClick={() => router.push("/achievements")} variant="outline">
+              <Button
+                onClick={() => router.push("/achievements")}
+                variant="outline"
+              >
                 View All Achievements
               </Button>
             </div>
@@ -426,6 +531,5 @@ export default function ProfilePage() {
         </Card>
       )}
     </div>
-  )
+  );
 }
-
