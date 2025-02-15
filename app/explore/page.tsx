@@ -399,7 +399,7 @@ export function ExplorePage() {
                 Volunteering for the Modern Era
               </p>
             </div>
-            {user && user.userType === 1 && (
+            {true&& (
               <Button
                 onClick={() => router.push("/add-initiative")}
                 className="bg-vollie-blue hover:bg-vollie-blue/90 text-white"

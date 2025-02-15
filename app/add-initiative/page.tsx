@@ -9,7 +9,7 @@ export default function AddInitiativePage() {
   const { user } = useAuth()
   const router = useRouter()
 
-  if (!user || user.type !== "organization") {
+  if (!user || user.userType !== 1) {
     return (
       <div className="container mx-auto py-8">
         <Card className="max-w-2xl mx-auto">
