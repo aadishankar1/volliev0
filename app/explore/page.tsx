@@ -172,7 +172,7 @@ export interface Filters {
   isMultiDay: boolean;
 }
 
-export function ExplorePage() {
+export default function ExplorePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState<Filters>({
     date: undefined,

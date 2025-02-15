@@ -75,11 +75,11 @@ export default function NotificationsPage() {
     }
   }
 
-  const handleEditEvent = (event) => {
+  const handleEditEvent = (event:any) => {
     setEditingEvent(event)
   }
 
-  const handleUpdateEvent = async (updatedEvent) => {
+  const handleUpdateEvent = async (updatedEvent:any) => {
     try {
       await updateInitiative(updatedEvent.id, updatedEvent)
       setEditingEvent(null)
@@ -89,7 +89,7 @@ export default function NotificationsPage() {
     }
   }
 
-  const handleDeleteEvent = async (eventId) => {
+  const handleDeleteEvent = async (eventId:any) => {
     try {
       await deleteInitiative(eventId)
       // Refresh the events list or update the local state
@@ -98,7 +98,7 @@ export default function NotificationsPage() {
     }
   }
 
-  const handleViewEventDetails = (event) => {
+  const handleViewEventDetails = (event:any) => {
     // Implement your event details viewing logic here
     console.log("Viewing details for event:", event)
   }
@@ -136,7 +136,7 @@ export default function NotificationsPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {user.notifications.length > 0 ? (
+            {user.notifications?.length > 0 ? (
               user.notifications.map((notification) => (
                 <motion.div
                   key={notification.id}
@@ -174,7 +174,7 @@ export default function NotificationsPage() {
         </CardContent>
       </Card>
 
-      {user.type === "volunteer" && (
+      {user.userType === 2 && (
         <>
           <Card className="mb-8 dark:bg-gray-800">
             <CardHeader>
@@ -242,7 +242,7 @@ export default function NotificationsPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {user.upcomingEvents && user.upcomingEvents.length > 0 ? (
+                {user.upcomingEvents && user.upcomingEvents?.length > 0 ? (
                   user.upcomingEvents.map((event) => (
                     <motion.div
                       key={event.id}
@@ -307,7 +307,7 @@ export default function NotificationsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {user.createdEvents && user.createdEvents.length > 0 ? (
+              {user.createdEvents && user.createdEvents?.length > 0 ? (
                 user.createdEvents.map((event) => (
                   <motion.div
                     key={event.id}
