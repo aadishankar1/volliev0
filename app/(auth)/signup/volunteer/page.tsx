@@ -61,8 +61,8 @@ export default function VolunteerSignUp() {
   };
 
   return (
-    <div className="container mx-auto py-8 pt-20">
-      <Card className="w-full max-w-md mx-auto">
+    <div className={!chooseIntrest ? "container mx-auto py-8 pt-20" : ""}>
+      <Card className={!chooseIntrest ? "w-full max-w-md mx-auto" : ""}>
         <CardHeader>
           <CardTitle>Sign Up as Volunteer</CardTitle>
           <CardDescription>Create your volunteer account</CardDescription>
