@@ -29,7 +29,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { format, isWithinInterval, parseISO } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
-
+import { toast } from "react-toastify";
+import { initiativeList } from "@/services/apiAction/initiative";
+import { useQuery } from "@tanstack/react-query";
+import Loader from "../components/Loader";
+import NoOpportunitiesCard from "./NoOpportunityCard";
 // Mock data with real images
 const opportunitiesData = [
   {
@@ -186,7 +190,7 @@ export default function ExplorePage() {
   );
   const { user, addNotification, signUpForInitiative, fetchInitiatives } =
     useAuth();
-  const { toast } = useToast();
+  // const { toast } = useToast();
   const [selectedOpportunity, setSelectedOpportunity] = useState<
     (typeof opportunitiesData)[0] | null
   >(null);
@@ -196,33 +200,34 @@ export default function ExplorePage() {
     // In a real application, you would fetch this data from an API
     setOpportunities(opportunitiesData);
   }, []);
+  const {
+    data: filteredOpportunities,
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["initiativeList"],
+    queryFn: () => initiativeList(filters),
+  });
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const data = await initiativeList(filters);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await fetchInitiatives();
-      } catch (error) {
-        console.error("Failed to fetch initiatives:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load initiatives. Please try again later.",
-          variant: "destructive",
-        });
-      }
-    };
+  //     } catch (error) {
+  //       console.error("Failed to fetch initiatives:", error);
+  //       toast.error("Failed to load initiatives. Please try again later.");
+  //     }
+  //   };
 
-    fetchData();
-  }, [fetchInitiatives, toast]);
+  //   fetchData();
+  // }, [fetchInitiatives, toast]);
 
   const handleSignUp = useCallback(
     async (opportunity: any) => {
       if (user?.userType !== 2) {
-        toast({
-          title: "Sign-up not allowed",
-          description:
-            "Organizations cannot sign up for volunteer opportunities.",
-          variant: "destructive",
-        });
+        toast.error(
+          "Organizations cannot sign up for volunteer opportunities."
+        );
         return;
       }
       try {
@@ -231,19 +236,13 @@ export default function ExplorePage() {
           opportunity.title,
           opportunity.organization
         );
-        toast({
-          title: "Request Sent! 🎉",
-          description: `Your request to join "${opportunity.title}" has been sent to ${opportunity.organization}.`,
-        });
+        toast.success(
+          `Your request to join "${opportunity.title}" has been sent to ${opportunity.organization}.`
+        );
         setSelectedOpportunity(null);
       } catch (error) {
         console.error("Failed to sign up for initiative:", error);
-        toast({
-          title: "Error",
-          description:
-            "Failed to sign up for the initiative. Please try again later.",
-          variant: "destructive",
-        });
+        toast("Failed to sign up for the initiative. Please try again later.");
       }
     },
     [toast, signUpForInitiative, user]
@@ -258,52 +257,50 @@ export default function ExplorePage() {
           url: window.location.href,
         });
       } catch (err) {
-        toast({
-          title: "Link Copied! 🔗",
-          description:
-            "The opportunity link has been copied to your clipboard.",
-        });
+        toast.success(
+          "The opportunity link has been copied to your clipboard."
+        );
       }
     },
     [toast]
   );
 
-  const filteredOpportunities = opportunities.filter((opp) => {
-    const matchesSearch =
-      opp.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      opp.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      opp.tags?.some((tag) =>
-        tag.toLowerCase().includes(searchTerm.toLowerCase())
-      ) ||
-      false;
+  // const filteredOpportunities = opportunities.filter((opp) => {
+  //   const matchesSearch =
+  //     opp.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //     opp.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //     opp.tags?.some((tag) =>
+  //       tag.toLowerCase().includes(searchTerm.toLowerCase())
+  //     ) ||
+  //     false;
 
-    const matchesVirtual =
-      !filters.isVirtual || opp.location?.toLowerCase().includes("virtual");
-    const matchesCampus =
-      !filters.isCampus || opp.location?.toLowerCase().includes("uc berkeley");
-    const matchesRadius =
-      filters.radius >=
-      calculateDistance(opp.latitude, opp.longitude, 37.8719, -122.2585); // UC Berkeley coordinates
+  //   const matchesVirtual =
+  //     !filters.isVirtual || opp.location?.toLowerCase().includes("virtual");
+  //   const matchesCampus =
+  //     !filters.isCampus || opp.location?.toLowerCase().includes("uc berkeley");
+  //   const matchesRadius =
+  //     filters.radius >=
+  //     calculateDistance(opp.latitude, opp.longitude, 37.8719, -122.2585); // UC Berkeley coordinates
 
-    const matchesDate =
-      !filters.date ||
-      isWithinInterval(parseISO(opp.startDate), {
-        start: filters.date,
-        end: new Date(filters.date.getTime() + 24 * 60 * 60 * 1000), // Next day
-      });
+  //   const matchesDate =
+  //     !filters.date ||
+  //     isWithinInterval(parseISO(opp.startDate), {
+  //       start: filters.date,
+  //       end: new Date(filters.date.getTime() + 24 * 60 * 60 * 1000), // Next day
+  //     });
 
-    const matchesMultiDay =
-      !filters.isMultiDay || (opp.endDate && opp.endDate !== opp.startDate);
+  //   const matchesMultiDay =
+  //     !filters.isMultiDay || (opp.endDate && opp.endDate !== opp.startDate);
 
-    return (
-      matchesSearch &&
-      matchesVirtual &&
-      matchesCampus &&
-      matchesRadius &&
-      matchesDate &&
-      matchesMultiDay
-    );
-  });
+  //   return (
+  //     matchesSearch &&
+  //     matchesVirtual &&
+  //     matchesCampus &&
+  //     matchesRadius &&
+  //     matchesDate &&
+  //     matchesMultiDay
+  //   );
+  // });
 
   const OpportunityCard = useCallback(
     ({ opportunity }: { opportunity: (typeof opportunitiesData)[0] }) => (
@@ -399,7 +396,7 @@ export default function ExplorePage() {
                 Volunteering for the Modern Era
               </p>
             </div>
-            {true&& (
+            {true && (
               <Button
                 onClick={() => router.push("/add-initiative")}
                 className="bg-vollie-blue hover:bg-vollie-blue/90 text-white"
@@ -440,11 +437,15 @@ export default function ExplorePage() {
               )}
 
               {/* Non-campus Opportunities Grid/List */}
+              {isLoading && <Loader />}
+              {!isLoading && !filteredOpportunities.length && (
+                <NoOpportunitiesCard />
+              )}
               {!filters.isCampus && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredOpportunities.map((opportunity) => (
+                  {(filteredOpportunities || []).map((opportunity: any) => (
                     <OpportunityCard
-                      key={opportunity.id}
+                      key={opportunity._id}
                       opportunity={opportunity}
                     />
                   ))}

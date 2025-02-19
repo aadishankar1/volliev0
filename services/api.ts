@@ -26,7 +26,7 @@ export const request = async <T>(
   if (data) {
     options.body = JSON.stringify(data);
   }
-
+  console.log(apiBasPath+endpoint,"epppp")
     const res = await fetch(`${apiBasPath}${endpoint}`, options);
     if (!res.ok) {
         const errorData = await res.json();

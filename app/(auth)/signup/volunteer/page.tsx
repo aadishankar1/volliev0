@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,13 +23,23 @@ export default function VolunteerSignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [location, setLocation] = useState("");
+  const [address, setAddress] = useState("");
   const [chooseIntrest, setChooseIntrest] = useState<Boolean>(false);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [bio, setBio] = useState("");
+  const [location, setLocation] = useState<{ lat?: number; lng?: number }>({});
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      // Retrieve latitude & longitude coordinates from `navigator.geolocation` Web API
+      navigator.geolocation.getCurrentPosition(({ coords }) => {
+        const { latitude, longitude } = coords;
+        setLocation({ lat: latitude, lng: longitude });
+      });
+    }
+  }, []);
   const router = useRouter();
   // const { toast } = useToast()
-  const {  createUser } = useAuth();
+  const { createUser } = useAuth();
   const handleNext = () => {
     if (password !== confirmPassword) {
       toast.error("Passwords do not match");
@@ -43,6 +53,9 @@ export default function VolunteerSignUp() {
       toast.error("Please ensure your passwords match.");
       return;
     }
+    if (!(location.lat && location.lng)) {
+      return toast.error("please allow location to signup");
+    }
     try {
       const createdUser = await createUser({
         email,
@@ -50,6 +63,9 @@ export default function VolunteerSignUp() {
         name,
         userType: 2,
         bio,
+        address,
+        lat:location.lat,
+        lng:location.lng,
         intrests: selectedInterests,
       });
 
@@ -94,8 +110,8 @@ export default function VolunteerSignUp() {
                   <Label htmlFor="location">Location</Label>
                   <Input
                     id="location"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
                     required
                   />
                 </div>

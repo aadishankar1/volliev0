@@ -1,57 +1,102 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
-import { useToast } from "@/components/ui/use-toast"
-import { useAuth } from "../../../context/AuthContext"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "../../../context/AuthContext";
 import { toast } from "react-toastify";
 
 export default function OrganizationSignUp() {
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [location, setLocation] = useState("")
-  const router = useRouter()
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [address, setAddress] = useState("");
+  const [location, setLocation] = useState<{ lat?: number; lng?: number }>({});
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      // Retrieve latitude & longitude coordinates from `navigator.geolocation` Web API
+      navigator.geolocation.getCurrentPosition(({ coords }) => {
+        const { latitude, longitude } = coords;
+        setLocation({ lat: latitude, lng: longitude });
+      });
+    }
+  }, []);
+  const router = useRouter();
   // const { toast } = useToast()
-  const { createUser } = useAuth()
+  const { createUser } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-  
-      try {
-        // await createUser({email, password,name,type:'organization'})
-        await createUser({ email, pass: password, name, userType: 1 });
-        toast.success("Your organization account has been created successfully.");
-        router.push("/profile");
-      } catch (error: any) {
-        toast.error(`Error: ${error.message}`);
-      }
-  }
+    e.preventDefault();
+    if (!(location.lat && location.lng)) {
+      return toast.error("please allow location to signup");
+    }
+    try {
+      // await createUser({email, password,name,type:'organization'})
+      await createUser({
+        email,
+        pass: password,
+        address,
+        lat: location.lat,
+        lng: location.lng,
+        name,
+        userType: 1,
+      });
+      toast.success("Your organization account has been created successfully.");
+      router.push("/profile");
+    } catch (error: any) {
+      toast.error(`Error: ${error.message}`);
+    }
+  };
 
   return (
     <div className="container mx-auto py-8 pt-20">
       <Card className="w-full max-w-md mx-auto">
         <CardHeader>
           <CardTitle>Sign Up as Organization</CardTitle>
-          <CardDescription>Create an account for your organization</CardDescription>
+          <CardDescription>
+            Create an account for your organization
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Organization Name</Label>
-              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="location">Location</Label>
-              <Input id="location" value={location} onChange={(e) => setLocation(e.target.value)} required />
+              <Input
+                id="location"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                required
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -78,6 +123,5 @@ export default function OrganizationSignUp() {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
-
