@@ -6,7 +6,8 @@ import { Footer } from "./components/Footer";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "@/components/theme-provider";
 import type React from "react"; // Added import for React
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -37,6 +38,7 @@ export default function RootLayout({
               <main className="flex-grow">{children}</main>
               <Footer />
               <Toaster />
+              <ToastContainer />
             </AuthProvider>
           </TanStackProvider>
         </ThemeProvider>

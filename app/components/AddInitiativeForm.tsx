@@ -17,11 +17,12 @@ import {
 } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
+import { add, format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "react-toastify";
 import Loader from "./Loader";
 import { uploadMedia } from "@/services/uploadMedia";
+import { addInitiative } from "@/services/apiAction/initiative";
 
 interface AddInitiativeFormProps {
   onClose: () => void;
@@ -35,7 +36,7 @@ export function AddInitiativeForm({ onClose }: AddInitiativeFormProps) {
   const [endDate, setEndDate] = useState<Date>();
   const [timeCommitment, setTimeCommitment] = useState("");
   const [isOnCampus, setIsOnCampus] = useState(false);
-  const [location, setLocation] = useState("");
+  const [address, setaddress] = useState("");
   const [volunteersNeeded, setVolunteersNeeded] = useState("");
   const [description, setDescription] = useState("");
 
@@ -44,47 +45,41 @@ export function AddInitiativeForm({ onClose }: AddInitiativeFormProps) {
   const { user, updateProfile } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user || user.userType !== 1) {
-      toast.error("Only organizations can add initiatives.");
-      return;
+    try {
+      e.preventDefault();
+      if (!user || user.userType !== 1) {
+        toast.error("Only organizations can add initiatives.");
+        return;
+      }
+      
+      // In a real application, you would send this data to your backend
+      const newInitiative = {
+        title,
+        img: image instanceof File ? URL.createObjectURL(image) : image,
+        startDate: startDate?.toISOString(),
+        endDate: isMultiDay ? endDate?.toISOString() : null,
+        timeCommitment,
+        address: isOnCampus ? "On Campus" : address,
+        volunteersNeeded: Number.parseInt(volunteersNeeded),
+        description,
+        status: 0,
+        isOnCampus,
+      };
+      await addInitiative(newInitiative);
+      console.log("new initiative", newInitiative);
+      toast.error("Your initiative has been successfully added.");
+      onClose();
+      router.push("/explore");
+    } catch (err: any) {
+      toast.error(`Error:${err.message}`);
     }
-
-    // In a real application, you would send this data to your backend
-    const newInitiative = {
-      id: Date.now().toString(),
-      title,
-      image: image ? URL.createObjectURL(image) : null,
-      organizationDescription: user.description,
-      startDate: startDate?.toISOString(),
-      endDate: isMultiDay ? endDate?.toISOString() : null,
-      timeCommitment,
-      location: isOnCampus ? "On Campus" : location,
-      volunteersNeeded: Number.parseInt(volunteersNeeded),
-      description,
-      tags: user.intrests,
-      organization: user.name,
-      status: "Open",
-      currentVolunteers: 0,
-    };
-
-    // Update user's stats
-    const updatedStats = {
-      ...user.stats,
-      initiativesCreated: (user.stats?.initiativesCreated || 0) + 1,
-    };
-
-    updateProfile({ stats: updatedStats });
-
-    toast.error("Your initiative has been successfully added.");
-    onClose();
-    router.push("/explore");
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      uploadMedia(e.target.files[0], setImage, null);
-      // setImage(e.target.files[0]);
+      // uploadMedia(e.target.files[0], setImage, null);
+      console.log(e.target.files[0],"e.target.files[0]")
+       setImage(e.target.files[0].name);
     }
   };
 
@@ -211,10 +206,10 @@ export function AddInitiativeForm({ onClose }: AddInitiativeFormProps) {
         </div>
         {!isOnCampus && (
           <Input
-            id="location"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder="Enter location"
+            id="address"
+            value={address}
+            onChange={(e) => setaddress(e.target.value)}
+            placeholder="Enter address"
             required
           />
         )}

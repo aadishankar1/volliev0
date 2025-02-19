@@ -30,109 +30,113 @@ import { format, isWithinInterval, parseISO } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import { toast } from "react-toastify";
-import { initiativeList } from "@/services/apiAction/initiative";
+import {
+  initiativeList,
+  signupInitiative,
+} from "@/services/apiAction/initiative";
 import { useQuery } from "@tanstack/react-query";
 import Loader from "../components/Loader";
 import NoOpportunitiesCard from "./NoOpportunityCard";
+import useDebounce from "@/hooks/debounce";
 // Mock data with real images
-const opportunitiesData = [
-  {
-    id: 1,
-    title: "Cal Day Volunteer",
-    organization: "UC Berkeley Visitor Services",
-    description:
-      "Help welcome prospective students and their families during Cal Day, UC Berkeley's annual open house.",
-    image: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f",
-    tags: ["Campus Event", "Tour Guide", "Customer Service"],
-    location: "UC Berkeley Campus",
-    timeCommitment: "6 hours",
-    volunteersNeeded: 50,
-    currentVolunteers: 30,
-    startDate: "2024-04-20",
-    endDate: "2024-04-20",
-    organizationDescription:
-      "UC Berkeley Visitor Services provides campus tours and information to visitors.",
-    latitude: 37.8719,
-    longitude: -122.2585,
-    status: "Open",
-  },
-  {
-    id: 2,
-    title: "Berkeley Food Pantry Assistant",
-    organization: "Berkeley Student Food Collective",
-    description:
-      "Help sort and distribute food to students in need at the UC Berkeley Food Pantry.",
-    image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c",
-    tags: ["Food Security", "Community Service", "Student Support"],
-    location: "UC Berkeley Food Pantry",
-    timeCommitment: "3 hours per week",
-    volunteersNeeded: 20,
-    currentVolunteers: 15,
-    startDate: "2024-03-01",
-    organizationDescription:
-      "The Berkeley Student Food Collective works to provide food security for all UC Berkeley students.",
-    latitude: 37.8686,
-    longitude: -122.258,
-    status: "Open",
-  },
-  {
-    id: 3,
-    title: "Big Game Week Setup",
-    organization: "Cal Athletics",
-    description:
-      "Help set up for various events during Big Game Week, leading up to the annual football game against Stanford.",
-    image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018",
-    tags: ["Sports", "Event Planning", "School Spirit"],
-    location: "Various Campus Locations",
-    timeCommitment: "4 hours per day",
-    volunteersNeeded: 40,
-    currentVolunteers: 25,
-    startDate: "2024-11-15",
-    organizationDescription:
-      "Cal Athletics oversees all intercollegiate sports at UC Berkeley.",
-    latitude: 37.8702,
-    longitude: -122.2528,
-    status: "Open",
-  },
-  {
-    id: 4,
-    title: "Library Book Drive",
-    organization: "UC Berkeley Libraries",
-    description:
-      "Assist in collecting and sorting book donations for the annual UC Berkeley Library book drive.",
-    image: "https://images.unsplash.com/photo-1507842217343-583bb7270b66",
-    tags: ["Education", "Library", "Book Drive"],
-    location: "Doe Library",
-    timeCommitment: "Flexible, 2-4 hours per shift",
-    volunteersNeeded: 30,
-    currentVolunteers: 10,
-    startDate: "2024-03-01",
-    organizationDescription:
-      "UC Berkeley Libraries provide resources and services to support research, teaching, and learning.",
-    latitude: 37.8723,
-    longitude: -122.2596,
-    status: "Open",
-  },
-  {
-    id: 5,
-    title: "Campus Sustainability Initiative",
-    organization: "Berkeley Office of Sustainability",
-    description:
-      "Participate in various sustainability projects around campus, including waste reduction and energy conservation efforts.",
-    image: "https://images.unsplash.com/photo-1536856136534-bb679c52a9aa",
-    tags: ["Environment", "Sustainability", "Campus Improvement"],
-    location: "UC Berkeley Campus",
-    timeCommitment: "5 hours per week",
-    volunteersNeeded: 25,
-    currentVolunteers: 18,
-    startDate: "2024-04-01",
-    organizationDescription:
-      "The Berkeley Office of Sustainability leads efforts to reduce the campus's environmental footprint.",
-    latitude: 37.8715,
-    longitude: -122.2596,
-    status: "Open",
-  },
-];
+// const opportunitiesData = [
+//   {
+//     id: 1,
+//     title: "Cal Day Volunteer",
+//     organization: "UC Berkeley Visitor Services",
+//     description:
+//       "Help welcome prospective students and their families during Cal Day, UC Berkeley's annual open house.",
+//     image: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f",
+//     tags: ["Campus Event", "Tour Guide", "Customer Service"],
+//     location: "UC Berkeley Campus",
+//     timeCommitment: "6 hours",
+//     volunteersNeeded: 50,
+//     currentVolunteers: 30,
+//     startDate: "2024-04-20",
+//     endDate: "2024-04-20",
+//     organizationDescription:
+//       "UC Berkeley Visitor Services provides campus tours and information to visitors.",
+//     latitude: 37.8719,
+//     longitude: -122.2585,
+//     status: "Open",
+//   },
+//   {
+//     id: 2,
+//     title: "Berkeley Food Pantry Assistant",
+//     organization: "Berkeley Student Food Collective",
+//     description:
+//       "Help sort and distribute food to students in need at the UC Berkeley Food Pantry.",
+//     image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c",
+//     tags: ["Food Security", "Community Service", "Student Support"],
+//     location: "UC Berkeley Food Pantry",
+//     timeCommitment: "3 hours per week",
+//     volunteersNeeded: 20,
+//     currentVolunteers: 15,
+//     startDate: "2024-03-01",
+//     organizationDescription:
+//       "The Berkeley Student Food Collective works to provide food security for all UC Berkeley students.",
+//     latitude: 37.8686,
+//     longitude: -122.258,
+//     status: "Open",
+//   },
+//   {
+//     id: 3,
+//     title: "Big Game Week Setup",
+//     organization: "Cal Athletics",
+//     description:
+//       "Help set up for various events during Big Game Week, leading up to the annual football game against Stanford.",
+//     image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018",
+//     tags: ["Sports", "Event Planning", "School Spirit"],
+//     location: "Various Campus Locations",
+//     timeCommitment: "4 hours per day",
+//     volunteersNeeded: 40,
+//     currentVolunteers: 25,
+//     startDate: "2024-11-15",
+//     organizationDescription:
+//       "Cal Athletics oversees all intercollegiate sports at UC Berkeley.",
+//     latitude: 37.8702,
+//     longitude: -122.2528,
+//     status: "Open",
+//   },
+//   {
+//     id: 4,
+//     title: "Library Book Drive",
+//     organization: "UC Berkeley Libraries",
+//     description:
+//       "Assist in collecting and sorting book donations for the annual UC Berkeley Library book drive.",
+//     image: "https://images.unsplash.com/photo-1507842217343-583bb7270b66",
+//     tags: ["Education", "Library", "Book Drive"],
+//     location: "Doe Library",
+//     timeCommitment: "Flexible, 2-4 hours per shift",
+//     volunteersNeeded: 30,
+//     currentVolunteers: 10,
+//     startDate: "2024-03-01",
+//     organizationDescription:
+//       "UC Berkeley Libraries provide resources and services to support research, teaching, and learning.",
+//     latitude: 37.8723,
+//     longitude: -122.2596,
+//     status: "Open",
+//   },
+//   {
+//     id: 5,
+//     title: "Campus Sustainability Initiative",
+//     organization: "Berkeley Office of Sustainability",
+//     description:
+//       "Participate in various sustainability projects around campus, including waste reduction and energy conservation efforts.",
+//     image: "https://images.unsplash.com/photo-1536856136534-bb679c52a9aa",
+//     tags: ["Environment", "Sustainability", "Campus Improvement"],
+//     location: "UC Berkeley Campus",
+//     timeCommitment: "5 hours per week",
+//     volunteersNeeded: 25,
+//     currentVolunteers: 18,
+//     startDate: "2024-04-01",
+//     organizationDescription:
+//       "The Berkeley Office of Sustainability leads efforts to reduce the campus's environmental footprint.",
+//     latitude: 37.8715,
+//     longitude: -122.2596,
+//     status: "Open",
+//   },
+// ];
 
 // Add this to your mock data
 const campusOpportunitiesData = [
@@ -185,42 +189,25 @@ export default function ExplorePage() {
     isCampus: false,
     isMultiDay: false,
   });
-  const [opportunities, setOpportunities] = useState<typeof opportunitiesData>(
-    []
-  );
+  const [opportunities, setOpportunities] = useState<
+    typeof filteredOpportunities
+  >([]);
   const { user, addNotification, signUpForInitiative, fetchInitiatives } =
     useAuth();
   // const { toast } = useToast();
   const [selectedOpportunity, setSelectedOpportunity] = useState<
-    (typeof opportunitiesData)[0] | null
+    (typeof filteredOpportunities)[0] | null
   >(null);
   const router = useRouter();
-
-  useEffect(() => {
-    // In a real application, you would fetch this data from an API
-    setOpportunities(opportunitiesData);
-  }, []);
+  const debouncedFilters = useDebounce(filters, 500);
   const {
     data: filteredOpportunities,
     error,
     isLoading,
   } = useQuery({
-    queryKey: ["initiativeList"],
-    queryFn: () => initiativeList(filters),
+    queryKey: ["initiativeList", debouncedFilters],
+    queryFn: () => initiativeList(debouncedFilters),
   });
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const data = await initiativeList(filters);
-
-  //     } catch (error) {
-  //       console.error("Failed to fetch initiatives:", error);
-  //       toast.error("Failed to load initiatives. Please try again later.");
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, [fetchInitiatives, toast]);
 
   const handleSignUp = useCallback(
     async (opportunity: any) => {
@@ -231,18 +218,15 @@ export default function ExplorePage() {
         return;
       }
       try {
-        await signUpForInitiative(
-          opportunity.id,
-          opportunity.title,
-          opportunity.organization
-        );
+        console.log(opportunity)
+        await signupInitiative({opportunity,initiativeId:opportunity._id,orgId:opportunity.userId});
         toast.success(
           `Your request to join "${opportunity.title}" has been sent to ${opportunity.organization}.`
         );
         setSelectedOpportunity(null);
       } catch (error) {
         console.error("Failed to sign up for initiative:", error);
-        toast("Failed to sign up for the initiative. Please try again later.");
+        toast.error("Failed to sign up for the initiative. Please try again later.");
       }
     },
     [toast, signUpForInitiative, user]
@@ -303,7 +287,7 @@ export default function ExplorePage() {
   // });
 
   const OpportunityCard = useCallback(
-    ({ opportunity }: { opportunity: (typeof opportunitiesData)[0] }) => (
+    ({ opportunity }: { opportunity: (typeof filteredOpportunities)[0] }) => (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -332,7 +316,7 @@ export default function ExplorePage() {
             </p>
             <div className="flex items-center text-sm text-muted-foreground mb-2">
               <MapPin className="h-4 w-4 mr-1 text-vollie-green" />
-              {opportunity.location || "Location not specified"}
+              {opportunity.address || "Location not specified"}
             </div>
             <div className="flex items-center text-sm text-muted-foreground mb-2">
               <Calendar className="h-4 w-4 mr-1 text-vollie-green" />
@@ -354,15 +338,17 @@ export default function ExplorePage() {
               {opportunity.volunteersNeeded} volunteers
             </div>
             <div className="flex flex-wrap gap-2 mt-2">
-              {opportunity.tags?.map((tag, index) => (
-                <Badge
-                  key={index}
-                  variant="secondary"
-                  className="bg-vollie-light-blue text-vollie-blue"
-                >
-                  {tag}
-                </Badge>
-              )) || <Badge variant="secondary">No tags</Badge>}
+              {(filteredOpportunities?.orgIntrests || []).map(
+                (tag: string, index: number) => (
+                  <Badge
+                    key={index}
+                    variant="secondary"
+                    className="bg-vollie-light-blue text-vollie-blue"
+                  >
+                    {tag}
+                  </Badge>
+                )
+              ) || <Badge variant="secondary">No tags</Badge>}
             </div>
           </CardContent>
         </Card>
@@ -544,7 +530,7 @@ export default function ExplorePage() {
                         <div>
                           <h4 className="font-medium">Location</h4>
                           <p className="text-muted-foreground">
-                            {selectedOpportunity.location}
+                            {selectedOpportunity.address}
                           </p>
                         </div>
                       </div>
@@ -560,11 +546,13 @@ export default function ExplorePage() {
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      {selectedOpportunity.tags.map((tag, index) => (
-                        <Badge key={index} variant="secondary">
-                          {tag}
-                        </Badge>
-                      ))}
+                      {(filteredOpportunities.tags || []).map(
+                        (tag: string, index: number) => (
+                          <Badge key={index} variant="secondary">
+                            {tag}
+                          </Badge>
+                        )
+                      )}
                     </div>
                   </div>
                   <div className="flex gap-4 mt-6">

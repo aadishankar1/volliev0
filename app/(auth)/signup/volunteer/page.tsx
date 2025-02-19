@@ -45,6 +45,12 @@ export default function VolunteerSignUp() {
       toast.error("Passwords do not match");
       return;
     }
+    if (!(location.lat && location.lng)) {
+      return toast.error("please allow location to signup");
+    }
+    if (!isBerkeleyEmail(email)) {
+      return toast.error("email should be berkeley org");
+    }
     setChooseIntrest(true);
   };
   const handleSubmit = async (e: React.FormEvent) => {
@@ -53,9 +59,7 @@ export default function VolunteerSignUp() {
       toast.error("Please ensure your passwords match.");
       return;
     }
-    if (!(location.lat && location.lng)) {
-      return toast.error("please allow location to signup");
-    }
+   
     try {
       const createdUser = await createUser({
         email,

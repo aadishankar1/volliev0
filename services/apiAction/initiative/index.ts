@@ -17,11 +17,31 @@ export const addInitiative = async (data: any): Promise<initiativeRes> => {
 
 export const initiativeList = async (data: any): Promise<any> => {
   try {
-    const endpoint = endpoints.initiative;
-
+    let endpoint = endpoints.initiative;
+    const queryString = new URLSearchParams(data).toString();
+    endpoint += `?${queryString}`;
     const res: initiativeRes = await request(endpoint, "GET");
     return res.res;
   } catch (error) {
     throw error;
   }
 };
+
+export const signupInitiative = async (data: any): Promise<any> => {
+    try {
+      const endpoint = endpoints.assignInitiative;
+      const res: initiativeRes = await request(endpoint, "POST",data);
+      return res.res;
+    } catch (error) {
+      throw error;
+    }
+  };
+  export const assignInitiativeList = async (data: any): Promise<any> => {
+    try {
+      const endpoint = endpoints.assignInitiative;
+      const res: initiativeRes = await request(endpoint, "GET",data);
+      return res.res;
+    } catch (error) {
+      throw error;
+    }
+  };

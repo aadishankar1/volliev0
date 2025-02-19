@@ -43,11 +43,20 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { format } from "date-fns"
+import { assignInitiativeList } from "@/services/apiAction/initiative"
+import { useQuery } from "@tanstack/react-query"
 
 export default function NotificationsPage() {
   const { user, markNotificationAsRead, cancelSignUp, updateInitiative, deleteInitiative } = useAuth()
   const [editingEvent, setEditingEvent] = useState(null)
-
+  const {
+    data: notification,
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["assignInitiative"],
+    queryFn: () => assignInitiativeList({}),
+  });
   const getIcon = (type: string) => {
     switch (type) {
       case "initiative_signup":
@@ -299,7 +308,7 @@ export default function NotificationsPage() {
         </>
       )}
 
-      {user.type === "organization" && (
+      {user.userType === 1 && (
         <Card className="mb-8 dark:bg-gray-800">
           <CardHeader>
             <CardTitle className="dark:text-gray-200">Upcoming Events</CardTitle>

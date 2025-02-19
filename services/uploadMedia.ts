@@ -5,7 +5,7 @@ export const uploadMedia = (
   setUrl: (url:string) => void,
   setProgress: any=null
 ) => {
-  const storageRef = ref(storage, `images/${new Date().getTime()}`);
+  const storageRef = ref(storage, `uploads/${new Date().getTime()}`);
   const uploadTask = uploadBytesResumable(storageRef, media);
   uploadTask.on(
     "state_changed",
@@ -13,6 +13,7 @@ export const uploadMedia = (
       const progress = Math.round(
         (snapshot.bytesTransferred / snapshot.totalBytes) * 100
       );
+      console.log(progress,"progresss")
       setProgress && setProgress(progress);
     },
     (error) => {
