@@ -49,8 +49,15 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
-import { assignInitiativeList } from "@/services/apiAction/initiative";
-import { useQuery } from "@tanstack/react-query";
+import {
+  acceptInitiative,
+  assignInitiativeList,
+} from "@/services/apiAction/initiative";
+import {
+  useQuery,
+  useInfiniteQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 export default function NotificationsPage() {
   const {
@@ -71,6 +78,7 @@ export default function NotificationsPage() {
     queryKey: ["assignInitiative"],
     queryFn: () => assignInitiativeList({}),
   });
+  const queryClient = useQueryClient();
   const status = ["Pending", "Accepted", "Rejected"];
   const getIcon = (type: string) => {
     switch (type) {
@@ -99,7 +107,16 @@ export default function NotificationsPage() {
     }
   };
   const initiativeAction = async (data: any, status: number) => {
-    
+    await acceptInitiative({ ...data, status });
+    queryClient.setQueryData(["assignInitiative"], (oldData: any) => {
+      if (!oldData) return oldData;
+      const updatedData = oldData.map((oldNotifData: any) => {
+        if (oldNotifData._id === data._id) {
+          return { ...oldNotifData, status };
+        } else return oldNotifData;
+      });
+      return [...updatedData];
+    });
   };
   const handleEditEvent = (event: any) => {
     setEditingEvent(event);
@@ -205,35 +222,34 @@ export default function NotificationsPage() {
                     </p>
                   </div>
                   <div className="flex space-x-2">
-                    {loggedInUser.userType == 2 && (
-                      <Badge variant={"default"}>
-                        {status[notification.status]}
-                      </Badge>
-                    )}
+                    <Badge variant={"default"}>
+                      {status[notification.status]}
+                    </Badge>
+
                     {loggedInUser.userType == 1 && notification.status == 0 && (
                       <>
                         <Button
                           variant="ghost"
-                          onClick={() => initiativeAction(notification, 1)}
+                          onClick={() => initiativeAction(notification, 2)}
                         >
                           Reject
                         </Button>
                         <Button
                           variant="secondary"
-                          onClick={() => initiativeAction(notification, 2)}
+                          onClick={() => initiativeAction(notification, 1)}
                         >
                           Accept
                         </Button>
                       </>
                     )}
-                    {!notification.read && (
+                    {/* {!notification.read && (
                       <Button
                         variant="ghost"
                         onClick={() => markNotificationAsRead(notification.id)}
                       >
                         Mark as read
                       </Button>
-                    )}
+                    )} */}
                   </div>
                 </motion.div>
               ))

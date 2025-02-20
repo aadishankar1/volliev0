@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,7 +34,7 @@ import {
   initiativeList,
   signupInitiative,
 } from "@/services/apiAction/initiative";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import Loader from "../components/Loader";
 import NoOpportunitiesCard from "./NoOpportunityCard";
 import useDebounce from "@/hooks/debounce";
@@ -201,14 +201,36 @@ export default function ExplorePage() {
   const router = useRouter();
   const debouncedFilters = useDebounce(filters, 500);
   const {
-    data: filteredOpportunities,
-    error,
-    isLoading,
-  } = useQuery({
+    data: apiData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    refetch,
+    isLoading
+  } = useInfiniteQuery({
     queryKey: ["initiativeList", debouncedFilters],
-    queryFn: () => initiativeList(debouncedFilters),
+    queryFn: initiativeList,
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+    initialPageParam: 0,
   });
+  useEffect(() => {
+    refetch();
+  }, [debouncedFilters]);
+  const filteredOpportunities: any = apiData?.pages;
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const lastItemRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isFetchingNextPage || !hasNextPage) return;
+      if (observerRef.current) observerRef.current.disconnect();
 
+      observerRef.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) fetchNextPage();
+      });
+
+      if (node) observerRef.current.observe(node);
+    },
+    [isFetchingNextPage, hasNextPage, fetchNextPage]
+  );
   const handleSignUp = useCallback(
     async (opportunity: any) => {
       if (user?.userType !== 2) {
@@ -218,15 +240,20 @@ export default function ExplorePage() {
         return;
       }
       try {
-        console.log(opportunity)
-        await signupInitiative({opportunity,initiativeId:opportunity._id,orgId:opportunity.userId});
+        await signupInitiative({
+          opportunity,
+          initiativeId: opportunity._id,
+          orgId: opportunity.userId,
+        });
         toast.success(
           `Your request to join "${opportunity.title}" has been sent to ${opportunity.organization}.`
         );
         setSelectedOpportunity(null);
       } catch (error) {
         console.error("Failed to sign up for initiative:", error);
-        toast.error("Failed to sign up for the initiative. Please try again later.");
+        toast.error(
+          "Failed to sign up for the initiative. Please try again later."
+        );
       }
     },
     [toast, signUpForInitiative, user]
@@ -287,7 +314,13 @@ export default function ExplorePage() {
   // });
 
   const OpportunityCard = useCallback(
-    ({ opportunity }: { opportunity: (typeof filteredOpportunities)[0] }) => (
+    ({
+      opportunity,
+      isLast,
+    }: {
+      opportunity: (typeof filteredOpportunities)[0];
+      isLast: boolean;
+    }) => (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -295,6 +328,7 @@ export default function ExplorePage() {
         transition={{ duration: 0.3 }}
       >
         <Card
+          ref={isLast ? lastItemRef : null}
           className="cursor-pointer hover:shadow-lg transition-shadow border-vollie-light-blue"
           onClick={() => setSelectedOpportunity(opportunity)}
         >
@@ -338,7 +372,7 @@ export default function ExplorePage() {
               {opportunity.volunteersNeeded} volunteers
             </div>
             <div className="flex flex-wrap gap-2 mt-2">
-              {(filteredOpportunities?.orgIntrests || []).map(
+              {(opportunity?.orgIntrests || []).map(
                 (tag: string, index: number) => (
                   <Badge
                     key={index}
@@ -424,19 +458,31 @@ export default function ExplorePage() {
 
               {/* Non-campus Opportunities Grid/List */}
               {isLoading && <Loader />}
-              {!isLoading && !filteredOpportunities.length && (
-                <NoOpportunitiesCard />
-              )}
+              { !isLoading &&!filteredOpportunities?.length && <NoOpportunitiesCard />}
               {!filters.isCampus && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {(filteredOpportunities || []).map((opportunity: any) => (
-                    <OpportunityCard
-                      key={opportunity._id}
-                      opportunity={opportunity}
-                    />
-                  ))}
+                  {(filteredOpportunities || []).map(
+                    (opportunityPage: any, opportunityPageIndex: number) =>
+                      (opportunityPage || []).map(
+                        (opportunity: any, index: number) => {
+                          const isLast =
+                            opportunityPageIndex ===
+                              filteredOpportunities.length - 1 &&
+                            index === opportunityPage.length - 1;
+                          return (
+                            <OpportunityCard
+                              isLast={isLast}
+                              key={opportunity._id}
+                              opportunity={opportunity}
+                            />
+                          );
+                        }
+                      )
+                  )}
                 </div>
               )}
+              {isFetchingNextPage && <p>Loading more...</p>}
+              {!hasNextPage && <p>No more data to load</p>}
             </motion.div>
           </AnimatePresence>
 
@@ -546,7 +592,7 @@ export default function ExplorePage() {
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      {(filteredOpportunities.tags || []).map(
+                      {(selectedOpportunity.tags || []).map(
                         (tag: string, index: number) => (
                           <Badge key={index} variant="secondary">
                             {tag}

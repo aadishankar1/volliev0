@@ -17,8 +17,11 @@ export const addInitiative = async (data: any): Promise<initiativeRes> => {
 
 export const initiativeList = async (data: any): Promise<any> => {
   try {
+    const { pageParam = 1, queryKey } = data;
+    const [, filter] = queryKey;
+    const cominedData = { ...filter, page: pageParam };
     let endpoint = endpoints.initiative;
-    const queryString = new URLSearchParams(data).toString();
+    const queryString = new URLSearchParams(cominedData).toString();
     endpoint += `?${queryString}`;
     const res: initiativeRes = await request(endpoint, "GET");
     return res.res;
@@ -45,7 +48,17 @@ export const assignInitiativeList = async (data: any): Promise<any> => {
     throw error;
   }
 };
-
+export const acceptInitiative = async (data: any): Promise<any> => {
+  try {
+    const endpoint = `${endpoints.assignInitiative}/${data._id}`;
+    const res: initiativeRes = await request(endpoint, "PUT", {
+      status: data.status,
+    });
+    return res.res;
+  } catch (error) {
+    throw error;
+  }
+};
 export const getLatLng = async (address: string) => {
   try {
     const apiKey = process.env.NEXT_PUBLIC_GEO_CODING_API_KEY;
