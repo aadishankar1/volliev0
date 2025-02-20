@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   Card,
   CardContent,
@@ -71,15 +71,36 @@ export default function NotificationsPage() {
   const [editingEvent, setEditingEvent] = useState(null);
   const loggedInUser: any = getUserfromToken();
   const {
-    data: notification,
-    error,
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
     isLoading,
-  } = useQuery({
+    isFetching,
+    refetch,
+  } = useInfiniteQuery({
     queryKey: ["assignInitiative"],
-    queryFn: () => assignInitiativeList({}),
+    queryFn: assignInitiativeList,
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+    initialPageParam: 0,
   });
+  const notification: any = data?.pages;
   const queryClient = useQueryClient();
   const status = ["Pending", "Accepted", "Rejected"];
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const lastItemRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (isFetchingNextPage || !hasNextPage) return;
+      if (observerRef.current) observerRef.current.disconnect();
+
+      observerRef.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) fetchNextPage();
+      });
+
+      if (node) observerRef.current.observe(node);
+    },
+    [isFetchingNextPage, hasNextPage, fetchNextPage]
+  );
   const getIcon = (type: string) => {
     switch (type) {
       case "initiative_signup":
@@ -188,61 +209,74 @@ export default function NotificationsPage() {
         <CardContent>
           <div className="space-y-4">
             {notification?.length > 0 ? (
-              notification.map((notification: any) => (
-                <motion.div
-                  key={notification._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex items-start space-x-4 p-4 bg-white dark:bg-gray-700 rounded-lg shadow"
-                >
-                  <div className="flex-shrink-0">
-                    {getIcon(notification.type)}
-                  </div>
-                  <div className="flex-grow">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold dark:text-gray-200">
-                        {notification.intiativesTitle}
-                      </h3>
-                      {/* {!notification.read && (
+              notification.map((notificationPage: any, pageIndex: number) =>
+                notificationPage.map((notification: any, index: number) => {
+                  const isLast =
+                    pageIndex === notification.length - 1 &&
+                    index === notificationPage.length - 1;
+                  return (
+                    <motion.div
+                      key={notification._id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="flex items-start space-x-4 p-4 bg-white dark:bg-gray-700 rounded-lg shadow"
+                    >
+                      <div
+                        ref={isLast ? lastItemRef : null}
+                        className="flex-shrink-0"
+                      >
+                        {getIcon(notification.type)}
+                      </div>
+                      <div className="flex-grow">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-semibold dark:text-gray-200">
+                            {notification.intiativesTitle}
+                          </h3>
+                          {/* {!notification.read && (
                         <Badge variant="secondary">New</Badge>
                       )} */}
-                      {loggedInUser.userType == 2 && (
-                        <Badge variant="secondary">own</Badge>
-                      )}
-                    </div>
-                    <p className="text-muted-foreground dark:text-gray-300">
-                      {notification?.initiativeDesc}
-                    </p>
-                    <p className="text-sm text-muted-foreground dark:text-gray-400 mt-1">
-                      {format(
-                        new Date(notification.intiativesStartDate),
-                        "PPP"
-                      )}
-                    </p>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Badge variant={"default"}>
-                      {status[notification.status]}
-                    </Badge>
+                          {loggedInUser.userType == 2 && (
+                            <Badge variant="secondary">own</Badge>
+                          )}
+                        </div>
+                        <p className="text-muted-foreground dark:text-gray-300">
+                          {notification?.initiativeDesc}
+                        </p>
+                        <p className="text-sm text-muted-foreground dark:text-gray-400 mt-1">
+                          {format(
+                            new Date(notification.intiativesStartDate),
+                            "PPP"
+                          )}
+                        </p>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Badge variant={"default"}>
+                          {status[notification.status]}
+                        </Badge>
 
-                    {loggedInUser.userType == 1 && notification.status == 0 && (
-                      <>
-                        <Button
-                          variant="ghost"
-                          onClick={() => initiativeAction(notification, 2)}
-                        >
-                          Reject
-                        </Button>
-                        <Button
-                          variant="secondary"
-                          onClick={() => initiativeAction(notification, 1)}
-                        >
-                          Accept
-                        </Button>
-                      </>
-                    )}
-                    {/* {!notification.read && (
+                        {loggedInUser.userType == 1 &&
+                          notification.status == 0 && (
+                            <>
+                              <Button
+                                variant="ghost"
+                                onClick={() =>
+                                  initiativeAction(notification, 2)
+                                }
+                              >
+                                Reject
+                              </Button>
+                              <Button
+                                variant="secondary"
+                                onClick={() =>
+                                  initiativeAction(notification, 1)
+                                }
+                              >
+                                Accept
+                              </Button>
+                            </>
+                          )}
+                        {/* {!notification.read && (
                       <Button
                         variant="ghost"
                         onClick={() => markNotificationAsRead(notification.id)}
@@ -250,15 +284,19 @@ export default function NotificationsPage() {
                         Mark as read
                       </Button>
                     )} */}
-                  </div>
-                </motion.div>
-              ))
+                      </div>
+                    </motion.div>
+                  );
+                })
+              ) 
             ) : (
               <p className="text-center text-muted-foreground dark:text-gray-400">
                 You don't have any notifications yet. Start volunteering to see
                 updates here!
               </p>
             )}
+             {isFetchingNextPage && <p>Loading more...</p>}
+             {!hasNextPage && <p>No more data to load</p>}
           </div>
         </CardContent>
       </Card>
