@@ -1,11 +1,13 @@
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "./../lib/firebase";
+
+
 export const uploadMedia = (
   media: any,
-  setUrl: (url:string) => void,
-  setProgress: any=null
+  setUrl: (url: string) => void,
+  setProgress: any = null
 ) => {
-  const storageRef = ref(storage, `uploads/${new Date().getTime()}`);
+  const storageRef = ref(storage, `images/${new Date().getTime()}`);
   const uploadTask = uploadBytesResumable(storageRef, media);
   uploadTask.on(
     "state_changed",
@@ -13,7 +15,7 @@ export const uploadMedia = (
       const progress = Math.round(
         (snapshot.bytesTransferred / snapshot.totalBytes) * 100
       );
-      console.log(progress,"progresss")
+      console.log(progress, "progresss");
       setProgress && setProgress(progress);
     },
     (error) => {

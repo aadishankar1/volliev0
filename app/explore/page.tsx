@@ -300,7 +300,7 @@ export default function ExplorePage() {
         >
           <div className="relative h-48 w-full">
             <Image
-              src={opportunity.image || "/placeholder.svg"}
+              src={opportunity.img || "/placeholder.svg"}
               alt={opportunity.title || "Volunteer Opportunity"}
               layout="fill"
               objectFit="cover"

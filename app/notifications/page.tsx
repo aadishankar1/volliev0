@@ -71,6 +71,7 @@ export default function NotificationsPage() {
     queryKey: ["assignInitiative"],
     queryFn: () => assignInitiativeList({}),
   });
+  const status = ["Pending", "Accepted", "Rejected"];
   const getIcon = (type: string) => {
     switch (type) {
       case "initiative_signup":
@@ -97,7 +98,9 @@ export default function NotificationsPage() {
         return <Bell className="h-5 w-5 text-gray-500" />;
     }
   };
-
+  const initiativeAction = async (data: any, status: number) => {
+    
+  };
   const handleEditEvent = (event: any) => {
     setEditingEvent(event);
   };
@@ -184,15 +187,15 @@ export default function NotificationsPage() {
                       <h3 className="text-lg font-semibold dark:text-gray-200">
                         {notification.intiativesTitle}
                       </h3>
-                      {!notification.read && (
+                      {/* {!notification.read && (
                         <Badge variant="secondary">New</Badge>
-                      )}
-                      {loggedInUser?.userId === notification.userId && (
-                        <Badge variant="secondary">Own</Badge>
+                      )} */}
+                      {loggedInUser.userType == 2 && (
+                        <Badge variant="secondary">own</Badge>
                       )}
                     </div>
                     <p className="text-muted-foreground dark:text-gray-300">
-                      {notification?.message || "this is test"}
+                      {notification?.initiativeDesc}
                     </p>
                     <p className="text-sm text-muted-foreground dark:text-gray-400 mt-1">
                       {format(
@@ -202,6 +205,27 @@ export default function NotificationsPage() {
                     </p>
                   </div>
                   <div className="flex space-x-2">
+                    {loggedInUser.userType == 2 && (
+                      <Badge variant={"default"}>
+                        {status[notification.status]}
+                      </Badge>
+                    )}
+                    {loggedInUser.userType == 1 && notification.status == 0 && (
+                      <>
+                        <Button
+                          variant="ghost"
+                          onClick={() => initiativeAction(notification, 1)}
+                        >
+                          Reject
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          onClick={() => initiativeAction(notification, 2)}
+                        >
+                          Accept
+                        </Button>
+                      </>
+                    )}
                     {!notification.read && (
                       <Button
                         variant="ghost"

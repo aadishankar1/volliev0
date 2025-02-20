@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "../context/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
@@ -22,7 +21,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "react-toastify";
 import Loader from "./Loader";
 import { uploadMedia } from "@/services/uploadMedia";
-import { addInitiative } from "@/services/apiAction/initiative";
+import { addInitiative, getLatLng } from "@/services/apiAction/initiative";
 
 interface AddInitiativeFormProps {
   onClose: () => void;
@@ -51,9 +50,9 @@ export function AddInitiativeForm({ onClose }: AddInitiativeFormProps) {
         toast.error("Only organizations can add initiatives.");
         return;
       }
-      
+
       // In a real application, you would send this data to your backend
-      const newInitiative = {
+      const newInitiative: any = {
         title,
         img: image instanceof File ? URL.createObjectURL(image) : image,
         startDate: startDate?.toISOString(),
@@ -65,9 +64,14 @@ export function AddInitiativeForm({ onClose }: AddInitiativeFormProps) {
         status: 0,
         isOnCampus,
       };
+      if (address && !isOnCampus) {
+        const data = await getLatLng(address);
+        newInitiative.lat = data?.lat;
+        newInitiative.lng = data?.lng;
+      }
       await addInitiative(newInitiative);
       console.log("new initiative", newInitiative);
-      toast.error("Your initiative has been successfully added.");
+      toast.success("Your initiative has been successfully added.");
       onClose();
       router.push("/explore");
     } catch (err: any) {
@@ -77,9 +81,7 @@ export function AddInitiativeForm({ onClose }: AddInitiativeFormProps) {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      // uploadMedia(e.target.files[0], setImage, null);
-      console.log(e.target.files[0],"e.target.files[0]")
-       setImage(e.target.files[0].name);
+      uploadMedia(e.target.files[0], setImage, null);
     }
   };
 
@@ -97,7 +99,7 @@ export function AddInitiativeForm({ onClose }: AddInitiativeFormProps) {
 
       <div className="space-y-2">
         <Label htmlFor="image">Initiative Image</Label>
-        <Loader />
+        {/* <Loader /> */}
         <Input
           id="image"
           type="file"
