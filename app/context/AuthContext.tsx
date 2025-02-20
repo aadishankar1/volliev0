@@ -133,6 +133,7 @@ type AuthContextType = {
     location?: string;
   }) => Promise<void>;
   createUser: (data: any) => Promise<void>;
+  getUserfromToken: () => string | null;
   logout: () => void;
   updateProfile: (data: Partial<User>) => void;
   loading: boolean;
@@ -785,6 +786,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       throw err;
     }
   };
+  const getUserfromToken = () => {
+    const token = Cookie.get("accessToken");
+    if (token) {
+      const user:any= jwtDecode(token);
+      return user
+    }
+    return null;
+  };
   return (
     <AuthContext.Provider
       value={{
@@ -794,6 +803,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         createUser,
         updateProfile,
         loading,
+        getUserfromToken,
         getPersonalizedRecommendations,
         calculateLevel,
         unlockAchievement,

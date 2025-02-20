@@ -1,9 +1,15 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Bell,
   CheckCircle,
@@ -17,9 +23,9 @@ import {
   ThumbsDown,
   X,
   Edit,
-} from "lucide-react"
-import { useAuth } from "../context/AuthContext"
-import { motion } from "framer-motion"
+} from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { motion } from "framer-motion";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,7 +36,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 import {
   Dialog,
   DialogContent,
@@ -38,17 +44,25 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { format } from "date-fns"
-import { assignInitiativeList } from "@/services/apiAction/initiative"
-import { useQuery } from "@tanstack/react-query"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { format } from "date-fns";
+import { assignInitiativeList } from "@/services/apiAction/initiative";
+import { useQuery } from "@tanstack/react-query";
 
 export default function NotificationsPage() {
-  const { user, markNotificationAsRead, cancelSignUp, updateInitiative, deleteInitiative } = useAuth()
-  const [editingEvent, setEditingEvent] = useState(null)
+  const {
+    user,
+    markNotificationAsRead,
+    cancelSignUp,
+    updateInitiative,
+    deleteInitiative,
+    getUserfromToken,
+  } = useAuth();
+  const [editingEvent, setEditingEvent] = useState(null);
+  const loggedInUser: any = getUserfromToken();
   const {
     data: notification,
     error,
@@ -60,57 +74,57 @@ export default function NotificationsPage() {
   const getIcon = (type: string) => {
     switch (type) {
       case "initiative_signup":
-        return <Calendar className="h-5 w-5 text-blue-500" />
+        return <Calendar className="h-5 w-5 text-blue-500" />;
       case "achievement_unlocked":
-        return <CheckCircle className="h-5 w-5 text-green-500" />
+        return <CheckCircle className="h-5 w-5 text-green-500" />;
       case "friend_request":
-        return <UserPlus className="h-5 w-5 text-purple-500" />
+        return <UserPlus className="h-5 w-5 text-purple-500" />;
       case "team_invite":
-        return <Users className="h-5 w-5 text-yellow-500" />
+        return <Users className="h-5 w-5 text-yellow-500" />;
       case "initiative_reminder":
-        return <Clock className="h-5 w-5 text-orange-500" />
+        return <Clock className="h-5 w-5 text-orange-500" />;
       case "signup_request":
-        return <UserPlus className="h-5 w-5 text-blue-500" />
+        return <UserPlus className="h-5 w-5 text-blue-500" />;
       case "signup_accepted":
-        return <ThumbsUp className="h-5 w-5 text-green-500" />
+        return <ThumbsUp className="h-5 w-5 text-green-500" />;
       case "signup_declined":
-        return <ThumbsDown className="h-5 w-5 text-red-500" />
+        return <ThumbsDown className="h-5 w-5 text-red-500" />;
       case "initiative_posted":
-        return <Calendar className="h-5 w-5 text-purple-500" />
+        return <Calendar className="h-5 w-5 text-purple-500" />;
       case "initiative_tomorrow":
-        return <AlertTriangle className="h-5 w-5 text-yellow-500" />
+        return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
       default:
-        return <Bell className="h-5 w-5 text-gray-500" />
+        return <Bell className="h-5 w-5 text-gray-500" />;
     }
-  }
+  };
 
-  const handleEditEvent = (event:any) => {
-    setEditingEvent(event)
-  }
+  const handleEditEvent = (event: any) => {
+    setEditingEvent(event);
+  };
 
-  const handleUpdateEvent = async (updatedEvent:any) => {
+  const handleUpdateEvent = async (updatedEvent: any) => {
     try {
-      await updateInitiative(updatedEvent.id, updatedEvent)
-      setEditingEvent(null)
+      await updateInitiative(updatedEvent.id, updatedEvent);
+      setEditingEvent(null);
       // Refresh the events list or update the local state
     } catch (error) {
-      console.error("Failed to update event:", error)
+      console.error("Failed to update event:", error);
     }
-  }
+  };
 
-  const handleDeleteEvent = async (eventId:any) => {
+  const handleDeleteEvent = async (eventId: any) => {
     try {
-      await deleteInitiative(eventId)
+      await deleteInitiative(eventId);
       // Refresh the events list or update the local state
     } catch (error) {
-      console.error("Failed to delete event:", error)
+      console.error("Failed to delete event:", error);
     }
-  }
+  };
 
-  const handleViewEventDetails = (event:any) => {
+  const handleViewEventDetails = (event: any) => {
     // Implement your event details viewing logic here
-    console.log("Viewing details for event:", event)
-  }
+    console.log("Viewing details for event:", event);
+  };
 
   if (!user) {
     return (
@@ -122,7 +136,9 @@ export default function NotificationsPage() {
           className="text-center"
         >
           <LogIn className="h-24 w-24 text-primary mb-4 mx-auto" />
-          <h1 className="text-3xl font-bold mb-4 dark:text-gray-200">Log in to view your notifications</h1>
+          <h1 className="text-3xl font-bold mb-4 dark:text-gray-200">
+            Log in to view your notifications
+          </h1>
           <p className="text-muted-foreground dark:text-gray-400 mb-8">
             Stay updated with your volunteering journey and new opportunities!
           </p>
@@ -131,43 +147,66 @@ export default function NotificationsPage() {
           </Button>
         </motion.div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="container mx-auto py-8 pt-20">
-      <h1 className="text-4xl font-bold mb-8 text-vollie-blue dark:text-vollie-blue">Notifications</h1>
+      <h1 className="text-4xl font-bold mb-8 text-vollie-blue dark:text-vollie-blue">
+        Notifications
+      </h1>
 
       <Card className="mb-8 dark:bg-gray-800">
         <CardHeader>
-          <CardTitle className="dark:text-gray-200">Your Recent Notifications</CardTitle>
-          <CardDescription className="dark:text-gray-400">Stay updated with your volunteering journey</CardDescription>
+          <CardTitle className="dark:text-gray-200">
+            Your Recent Notifications
+          </CardTitle>
+          <CardDescription className="dark:text-gray-400">
+            Stay updated with your volunteering journey
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {user.notifications?.length > 0 ? (
-              user.notifications.map((notification) => (
+            {notification?.length > 0 ? (
+              notification.map((notification: any) => (
                 <motion.div
-                  key={notification.id}
+                  key={notification._id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                   className="flex items-start space-x-4 p-4 bg-white dark:bg-gray-700 rounded-lg shadow"
                 >
-                  <div className="flex-shrink-0">{getIcon(notification.type)}</div>
+                  <div className="flex-shrink-0">
+                    {getIcon(notification.type)}
+                  </div>
                   <div className="flex-grow">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold dark:text-gray-200">{notification.title}</h3>
-                      {!notification.read && <Badge variant="secondary">New</Badge>}
+                      <h3 className="text-lg font-semibold dark:text-gray-200">
+                        {notification.intiativesTitle}
+                      </h3>
+                      {!notification.read && (
+                        <Badge variant="secondary">New</Badge>
+                      )}
+                      {loggedInUser?.userId === notification.userId && (
+                        <Badge variant="secondary">Own</Badge>
+                      )}
                     </div>
-                    <p className="text-muted-foreground dark:text-gray-300">{notification.message}</p>
+                    <p className="text-muted-foreground dark:text-gray-300">
+                      {notification?.message || "this is test"}
+                    </p>
                     <p className="text-sm text-muted-foreground dark:text-gray-400 mt-1">
-                      {format(new Date(notification.date), "PPP")}
+                      {format(
+                        new Date(notification.intiativesStartDate),
+                        "PPP"
+                      )}
                     </p>
                   </div>
                   <div className="flex space-x-2">
                     {!notification.read && (
-                      <Button variant="ghost" onClick={() => markNotificationAsRead(notification.id)}>
+                      <Button
+                        variant="ghost"
+                        onClick={() => markNotificationAsRead(notification.id)}
+                      >
                         Mark as read
                       </Button>
                     )}
@@ -176,14 +215,15 @@ export default function NotificationsPage() {
               ))
             ) : (
               <p className="text-center text-muted-foreground dark:text-gray-400">
-                You don't have any notifications yet. Start volunteering to see updates here!
+                You don't have any notifications yet. Start volunteering to see
+                updates here!
               </p>
             )}
           </div>
         </CardContent>
       </Card>
 
-      {user.userType === 2 && (
+      {/* {user.userType === 2 && (
         <>
           <Card className="mb-8 dark:bg-gray-800">
             <CardHeader>
@@ -306,75 +346,9 @@ export default function NotificationsPage() {
             </CardContent>
           </Card>
         </>
-      )}
+      )} */}
 
-      {user.userType === 1 && (
-        <Card className="mb-8 dark:bg-gray-800">
-          <CardHeader>
-            <CardTitle className="dark:text-gray-200">Upcoming Events</CardTitle>
-            <CardDescription className="dark:text-gray-400">Manage your organization's initiatives</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {user.createdEvents && user.createdEvents?.length > 0 ? (
-                user.createdEvents.map((event) => (
-                  <motion.div
-                    key={event.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="flex items-start space-x-4 p-4 bg-white dark:bg-gray-700 rounded-lg shadow"
-                  >
-                    <div className="flex-shrink-0">
-                      <Calendar className="h-5 w-5 text-green-500" />
-                    </div>
-                    <div className="flex-grow">
-                      <h3 className="text-lg font-semibold dark:text-gray-200">{event.title}</h3>
-                      <p className="text-muted-foreground dark:text-gray-300">{event.description}</p>
-                      <p className="text-sm text-muted-foreground dark:text-gray-400 mt-1">
-                        Date: {format(new Date(event.date), "PPP")}
-                      </p>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button variant="outline" size="sm" onClick={() => handleEditEvent(event)}>
-                        <Edit className="h-4 w-4 mr-2" />
-                        Edit
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="destructive" size="sm">
-                            <X className="h-4 w-4 mr-2" />
-                            Remove
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action cannot be undone. This will permanently delete this event and notify all
-                              participants.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDeleteEvent(event.id)}>Confirm</AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </motion.div>
-                ))
-              ) : (
-                <p className="text-center text-muted-foreground dark:text-gray-400">
-                  You haven't created any events yet. Start by adding a new initiative!
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      <Dialog open={!!editingEvent} onOpenChange={() => setEditingEvent(null)}>
+      {/* <Dialog open={true} onOpenChange={() => setEditingEvent(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Event</DialogTitle>
@@ -429,8 +403,7 @@ export default function NotificationsPage() {
             </form>
           )}
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
     </div>
-  )
+  );
 }
-
