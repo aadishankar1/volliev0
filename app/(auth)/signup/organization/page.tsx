@@ -45,6 +45,7 @@ export default function OrganizationSignUp() {
       return toast.error("please allow location to signup");
     }
     if (!isBerkeleyEmail(email)) {
+      console.log("cvxgdfgd")
       return toast.error("email should be berkeley org");
     }
     setChooseIntrest(true);
