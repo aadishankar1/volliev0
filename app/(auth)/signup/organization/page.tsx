@@ -17,6 +17,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "../../../context/AuthContext";
 import { toast } from "react-toastify";
 import Intrests from "../volunteer/intresets";
+import { isBerkeleyEmail } from "@/lib/helper";
 
 export default function OrganizationSignUp() {
   const [name, setName] = useState("");
