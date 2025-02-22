@@ -131,12 +131,17 @@ export default function NotificationsPage() {
     await acceptInitiative({ ...data, status });
     queryClient.setQueryData(["assignInitiative"], (oldData: any) => {
       if (!oldData) return oldData;
-      const updatedData = oldData.map((oldNotifData: any) => {
-        if (oldNotifData._id === data._id) {
-          return { ...oldNotifData, status };
-        } else return oldNotifData;
-      });
-      return [...updatedData];
+      const itrateData: any = Array.isArray(oldData.pages)
+        ? oldData.pages
+        : oldData;
+      const updatedData = itrateData.map((itrArr: any) =>
+        itrArr.map((oldNotifData: any) => {
+          if (oldNotifData._id == data._id) {
+            return { ...oldNotifData, status };
+          } else return oldNotifData;
+        })
+      );
+      return { ...oldData, pages: updatedData };
     });
   };
   const handleEditEvent = (event: any) => {
@@ -288,15 +293,15 @@ export default function NotificationsPage() {
                     </motion.div>
                   );
                 })
-              ) 
+              )
             ) : (
               <p className="text-center text-muted-foreground dark:text-gray-400">
                 You don't have any notifications yet. Start volunteering to see
                 updates here!
               </p>
             )}
-             {isFetchingNextPage && <p>Loading more...</p>}
-             {!hasNextPage && <p>No more data to load</p>}
+            {isFetchingNextPage && <p>Loading more...</p>}
+            {!hasNextPage && <p>No more data to load</p>}
           </div>
         </CardContent>
       </Card>
