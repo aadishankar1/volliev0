@@ -38,6 +38,7 @@ export function AddInitiativeForm({ onClose }: AddInitiativeFormProps) {
   const [address, setaddress] = useState("");
   const [volunteersNeeded, setVolunteersNeeded] = useState("");
   const [description, setDescription] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
   // const { toast } = useToast()
@@ -50,7 +51,7 @@ export function AddInitiativeForm({ onClose }: AddInitiativeFormProps) {
         toast.error("Only organizations can add initiatives.");
         return;
       }
-
+      setIsLoading(true);
       // In a real application, you would send this data to your backend
       const newInitiative: any = {
         title,
@@ -71,10 +72,12 @@ export function AddInitiativeForm({ onClose }: AddInitiativeFormProps) {
       }
       await addInitiative(newInitiative);
       console.log("new initiative", newInitiative);
+      setIsLoading(false);
       toast.success("Your initiative has been successfully added.");
       onClose();
       router.push("/explore");
     } catch (err: any) {
+      setIsLoading(false);
       toast.error(`Error:${err.message}`);
     }
   };
@@ -242,6 +245,7 @@ export function AddInitiativeForm({ onClose }: AddInitiativeFormProps) {
       <Button
         type="submit"
         className="w-full bg-vollie-blue hover:bg-vollie-blue/90 text-white"
+        loading={isLoading}
       >
         Add Initiative
       </Button>

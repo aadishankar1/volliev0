@@ -84,6 +84,7 @@ export default function NotificationsPage() {
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialPageParam: 0,
   });
+  const [actionLoading, setActionLoading] = useState(false);
   const notification: any = data?.pages;
   const queryClient = useQueryClient();
   const status = ["Pending", "Accepted", "Rejected"];
@@ -128,6 +129,7 @@ export default function NotificationsPage() {
     }
   };
   const initiativeAction = async (data: any, status: number) => {
+    setActionLoading(true);
     await acceptInitiative({ ...data, status });
     queryClient.setQueryData(["assignInitiative"], (oldData: any) => {
       if (!oldData) return oldData;
@@ -143,6 +145,7 @@ export default function NotificationsPage() {
       );
       return { ...oldData, pages: updatedData };
     });
+    setActionLoading(false);
   };
   const handleEditEvent = (event: any) => {
     setEditingEvent(event);
@@ -268,6 +271,7 @@ export default function NotificationsPage() {
                                 onClick={() =>
                                   initiativeAction(notification, 2)
                                 }
+                                loading={actionLoading}
                               >
                                 Reject
                               </Button>
@@ -276,6 +280,7 @@ export default function NotificationsPage() {
                                 onClick={() =>
                                   initiativeAction(notification, 1)
                                 }
+                                loading={actionLoading}
                               >
                                 Accept
                               </Button>
