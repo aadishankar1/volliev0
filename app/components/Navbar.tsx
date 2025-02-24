@@ -3,13 +3,20 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
+<<<<<<< HEAD
 import { LogOut, Globe, Bell, User, Plus, Award } from "lucide-react"
+=======
+import { LogOut, Globe, Bell, Trophy, User, Plus, Award, Users, MessageSquare, Menu } from "lucide-react"
+>>>>>>> c1a5115ad8324999f9a144066399c5b279dc5111
 import { useAuth } from "../context/AuthContext"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+<<<<<<< HEAD
 import type React from "react"
+=======
+>>>>>>> c1a5115ad8324999f9a144066399c5b279dc5111
 
 const Navbar = () => {
   const pathname = usePathname()
@@ -41,17 +48,31 @@ const Navbar = () => {
             <Link href="/explore" className="flex items-center space-x-2">
               <Image
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Copy_of_Volunteen_Logo-removebg-preview-RiE6TyzfOc1innz0Iud7ZxghahIAY0.png"
+<<<<<<< HEAD
                 alt="Vollie Logo"
+=======
+                alt="Volunteen Logo"
+>>>>>>> c1a5115ad8324999f9a144066399c5b279dc5111
                 width={40}
                 height={40}
                 className="w-auto h-8"
               />
+<<<<<<< HEAD
               <span className="text-2xl font-bold text-vollie-blue">Vollie</span>
+=======
+              <span className="text-2xl font-bold text-primary">Volunteen</span>
+>>>>>>> c1a5115ad8324999f9a144066399c5b279dc5111
             </Link>
             <div className="hidden md:flex space-x-1">
               <NavLink href="/explore" current={pathname} icon={<Globe className="h-4 w-4" />}>
                 Explore
               </NavLink>
+<<<<<<< HEAD
+=======
+              <NavLink href="/social" current={pathname} icon={<Users className="h-4 w-4" />}>
+                Social
+              </NavLink>
+>>>>>>> c1a5115ad8324999f9a144066399c5b279dc5111
               <NavLink href="/notifications" current={pathname} icon={<Bell className="h-4 w-4" />}>
                 Notifications
               </NavLink>
@@ -104,9 +125,21 @@ const Navbar = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
+<<<<<<< HEAD
         <div className="grid grid-cols-4 h-full">
           <MobileNavLink href="/explore" current={pathname} icon={<Globe className="h-6 w-6" />} label="Explore" />
           <MobileNavLink
+=======
+        <div className="grid grid-cols-5 h-full">
+          <MobileNavLink href="/explore" current={pathname} icon={<Globe className="h-6 w-6" />} label="Explore" />
+          <MobileNavLink
+            href="/social"
+            current={pathname}
+            icon={<MessageSquare className="h-6 w-6" />}
+            label="Social"
+          />
+          <MobileNavLink
+>>>>>>> c1a5115ad8324999f9a144066399c5b279dc5111
             href="/notifications"
             current={pathname}
             icon={<Bell className="h-6 w-6" />}
@@ -117,6 +150,7 @@ const Navbar = () => {
           ) : (
             <MobileNavLink href="/login" current={pathname} icon={<User className="h-6 w-6" />} label="Login" />
           )}
+<<<<<<< HEAD
           {user && user.type === "organization" && (
             <MobileNavLink
               href="/add-initiative"
@@ -125,6 +159,9 @@ const Navbar = () => {
               label="Add Initiative"
             />
           )}
+=======
+          <MobileNavLink href="/menu" current={pathname} icon={<Menu className="h-6 w-6" />} label="Menu" />
+>>>>>>> c1a5115ad8324999f9a144066399c5b279dc5111
         </div>
       </motion.nav>
     </>

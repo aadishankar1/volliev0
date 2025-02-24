@@ -5,11 +5,12 @@ import Navbar from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "@/components/theme-provider";
-import type React from "react"; // Added import for React
+import type React from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import TanStackProvider from "@/providers/TanstackProviders";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {

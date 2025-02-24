@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import ExplorePage from "./explore/page";
 
 export default function Home() {
@@ -7,3 +8,11 @@ export default function Home() {
   // Otherwise, render the ExplorePage directly
   return <ExplorePage />;
 }
+=======
+import { redirect } from "next/navigation"
+
+export default function Home() {
+  redirect("/explore")
+}
+
+>>>>>>> c1a5115ad8324999f9a144066399c5b279dc5111
