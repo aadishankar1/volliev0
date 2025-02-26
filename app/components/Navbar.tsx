@@ -63,7 +63,7 @@ const Navbar = () => {
                   <NavLink href="/achievements" current={pathname} icon={<Award className="h-4 w-4" />}>
                     Achievements
                   </NavLink>
-                  {user.type === "organization" && (
+                  {user.userType === 1 && (
                     <NavLink href="/add-initiative" current={pathname} icon={<Plus className="h-4 w-4" />}>
                       Add Initiative
                     </NavLink>
@@ -117,7 +117,7 @@ const Navbar = () => {
           ) : (
             <MobileNavLink href="/login" current={pathname} icon={<User className="h-6 w-6" />} label="Login" />
           )}
-          {user && user.type === "organization" && (
+          {user && user.userType === 1 && (
             <MobileNavLink
               href="/add-initiative"
               current={pathname}

@@ -37,28 +37,8 @@ export default function OrganizationSignUp() {
   const [chooseIntrest, setChooseIntrest] = useState<Boolean>(false);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [bio, setBio] = useState("");
-  // useEffect(() => {
-  //   if ("geolocation" in navigator) {
-  //     navigator.geolocation.getCurrentPosition(
-  //       ({ coords }) => {
-  //         const { latitude, longitude } = coords;
-  //         setLocation({ lat: latitude, lng: longitude });
-  //         setLocationError("");
-  //       },
-  //       (error) => {
-  //         console.error("Geolocation error:", error);
-  //         setLocationError(
-  //           "Location access is required to help volunteers find your opportunities. " +
-  //             "Please enable location access in your browser settings and refresh the page."
-  //         );
-  //       }
-  //     );
-  //   } else {
-  //     setLocationError(
-  //       "Your browser doesn't support geolocation. Please try a different browser."
-  //     );
-  //   }
-  // }, []);
+  const [isLoading, setIsloading] = useState<null | boolean>(false);
+
   const router = useRouter();
   // const { toast } = useToast()
   const { createUser } = useAuth();
@@ -97,6 +77,7 @@ export default function OrganizationSignUp() {
     }
 
     try {
+      setIsloading(true);
       const createdUser = await createUser({
         email,
         pass: password,
@@ -110,10 +91,11 @@ export default function OrganizationSignUp() {
         img: avatar,
         intrests: selectedInterests,
       });
-
+      setIsloading(false);
       toast.success("Your organization account has been created successfully.");
       router.push("/profile");
     } catch (error: any) {
+      setIsloading(false);
       toast.error(`Error: ${error.message}`);
     }
   };
@@ -280,6 +262,7 @@ export default function OrganizationSignUp() {
                 setSelectedInterests={setSelectedInterests}
                 bio={bio}
                 setBio={setBio}
+                isLoading={isLoading}
               />
             )}
           </form>

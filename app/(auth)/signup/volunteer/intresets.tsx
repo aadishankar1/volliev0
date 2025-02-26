@@ -21,6 +21,7 @@ interface InterestsProps {
   setSelectedInterests: (interests: string[]) => void;
   bio: string;
   setBio: (bio: string) => void;
+  isLoading?:boolean|null
 }
 
 export default function Interests({
@@ -28,6 +29,7 @@ export default function Interests({
   setSelectedInterests,
   bio,
   setBio,
+  isLoading
 }: InterestsProps) {
   const handleInterestToggle = (interest: string) => {
     if (selectedInterests.includes(interest)) {
@@ -112,7 +114,7 @@ export default function Interests({
               {bio.length}/500 characters
             </p>
           </div>
-          <Button type="submit" className="w-full bg-vollie-blue hover:bg-vollie-blue/90">
+          <Button type="submit" className="w-full bg-vollie-blue hover:bg-vollie-blue/90" loading={isLoading||false}>
             Complete Profile
           </Button>
         </CardContent>

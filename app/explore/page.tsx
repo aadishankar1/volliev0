@@ -203,11 +203,8 @@ export default function ExplorePage() {
     refetch,
     isLoading
   } = useInfiniteQuery({
-    queryKey: ["initiativeList", filters as InitiativeFilters],
-    queryFn: ({ pageParam = 0 }) => initiativeList({
-      pageParam,
-      queryKey: ["initiativeList", filters as InitiativeFilters]
-    }),
+    queryKey: ["initiativeList", debouncedFilters],
+    queryFn: initiativeList,
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialPageParam: 0,
   });
@@ -215,6 +212,7 @@ export default function ExplorePage() {
     refetch();
   }, [debouncedFilters]);
   const filteredOpportunities: any = apiData?.pages;
+  console.log("dsgdf",apiData)
   const observerRef = useRef<IntersectionObserver | null>(null);
   const lastItemRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -486,18 +484,19 @@ export default function ExplorePage() {
 
                   {/* Non-campus Opportunities Grid/List */}
                   {isLoading && <Loader />}
-                  {!isLoading && !filters.isCampus && apiData?.pages[0]?.initiatives?.length === 0 && (
+                  {!isLoading  && apiData?.pages[0]?.length === 0 && (
                     <div className="flex justify-center items-center min-h-[400px]">
                       <NoOpportunitiesCard />
                     </div>
                   )}
-                  {!filters.isCampus && apiData?.pages[0]?.initiatives?.length > 0 && (
+                  {/* {console.log(apiData)} */}
+                  { apiData && apiData.pages?.[0]?.length > 0 && (
                     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                       {apiData?.pages?.map((page, pageIndex) =>
-                        page.initiatives.map((opportunity, index) => {
+                        page.map((opportunity:any, index:number) => {
                           const isLast =
                             pageIndex === (apiData?.pages?.length ?? 0) - 1 &&
-                            index === page.initiatives.length - 1;
+                            index === page.length - 1;
                           return (
                             <OpportunityCard
                               key={opportunity._id}
@@ -514,7 +513,7 @@ export default function ExplorePage() {
                       <p className="text-muted-foreground">Loading more...</p>
                     </div>
                   )}
-                  {!hasNextPage && apiData?.pages[0]?.initiatives?.length > 0 && (
+                  {!hasNextPage && apiData?.pages[0]?.length > 0 && (
                     <div className="flex justify-center items-center mt-8">
                       <p className="text-muted-foreground">No more opportunities to load</p>
                     </div>

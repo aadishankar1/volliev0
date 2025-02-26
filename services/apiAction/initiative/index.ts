@@ -17,43 +17,20 @@ export const addInitiative = async (data: CreateInitiativeData): Promise<Initiat
   }
 };
 
-export const initiativeList = async ({
-  pageParam = 1,
-  queryKey,
-}: {
-  pageParam?: number;
-  queryKey: [string, InitiativeFilters];
-}): Promise<{
-  initiatives: Initiative[];
-  nextPage: number | undefined;
-  total: number;
-}> => {
-  try {
-    const [, filters] = queryKey;
-    const queryParams = {
-      ...filters,
-      page: pageParam,
-      interests: filters.interests?.join(","),
-    };
-
-    let endpoint = endpoints.initiative;
-    const filteredEntries = Object.entries(queryParams)
-      .filter(([_, v]) => v != null)
-      .map(([key, value]) => [key, String(value)]);
-    
-    const queryString = new URLSearchParams(filteredEntries).toString();
-    endpoint += `?${queryString}`;
-
-    const res: InitiativeResponse = await request(endpoint, "GET");
-    return {
-      initiatives: res.res.list || [],
-      nextPage: res.res.nextPage,
-      total: res.res.total || 0,
-    };
-  } catch (error) {
-    throw error;
-  }
-};
+export const initiativeList = async (data: any): Promise<any> => {
+    try {
+      const { pageParam = 1, queryKey } = data;
+      const [, filter] = queryKey;
+      const cominedData = { ...filter, page: pageParam };
+      let endpoint = endpoints.initiative;
+      const queryString = new URLSearchParams(cominedData).toString();
+      endpoint += `?${queryString}`;
+      const res: InitiativeResponse = await request(endpoint, "GET");
+      return res.res;
+    } catch (error) {
+      throw error;
+    }
+  };
 
 export const signupInitiative = async (data: {
   initiativeId: string;

@@ -24,7 +24,13 @@ import { uploadMedia } from "@/services/uploadMedia";
 import { addInitiative, getLatLng } from "@/services/apiAction/initiative";
 import { INTEREST_CATEGORIES, ALL_INTERESTS } from "@/lib/constants/interests";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import AddressAutocomplete from "./LocationTypehead";
 
 interface AddInitiativeFormProps {
   onClose: () => void;
@@ -38,7 +44,8 @@ export function AddInitiativeForm({ onClose }: AddInitiativeFormProps) {
   const [endDate, setEndDate] = useState<Date>();
   const [timeCommitment, setTimeCommitment] = useState("");
   const [isOnCampus, setIsOnCampus] = useState(false);
-  const [address, setaddress] = useState("");
+  const [address, setAddress] = useState("");
+  const [location, setLocation] = useState<{ lat?: number; lng?: number }>({});
   const [volunteersNeeded, setVolunteersNeeded] = useState("");
   const [description, setDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -82,10 +89,9 @@ export function AddInitiativeForm({ onClose }: AddInitiativeFormProps) {
         isOnCampus,
         interests: selectedInterests,
       };
-      if (address && !isOnCampus) {
-        const data = await getLatLng(address);
-        newInitiative.lat = data?.lat;
-        newInitiative.lng = data?.lng;
+      if (location.lat && location.lng && !isOnCampus) {
+        newInitiative.lat = location?.lat;
+        newInitiative.lng = location?.lng;
       }
       await addInitiative(newInitiative);
       console.log("new initiative", newInitiative);
@@ -227,13 +233,15 @@ export function AddInitiativeForm({ onClose }: AddInitiativeFormProps) {
           <Label htmlFor="on-campus">On Campus</Label>
         </div>
         {!isOnCampus && (
-          <Input
-            id="address"
-            value={address}
-            onChange={(e) => setaddress(e.target.value)}
-            placeholder="Enter address"
-            required
-          />
+           <AddressAutocomplete
+           className="w-full px-3 py-2"
+           placeholder="Enter Address"
+           setLocation={setLocation}
+           onPlaceSelected={(place) =>
+             setAddress(place.formatted_address || "")
+           }
+         />
+          
         )}
       </div>
 
@@ -277,7 +285,11 @@ export function AddInitiativeForm({ onClose }: AddInitiativeFormProps) {
                     {category.interests.map((interest) => (
                       <Badge
                         key={interest}
-                        variant={selectedInterests.includes(interest) ? "default" : "outline"}
+                        variant={
+                          selectedInterests.includes(interest)
+                            ? "default"
+                            : "outline"
+                        }
                         className={`cursor-pointer ${
                           selectedInterests.includes(interest)
                             ? "bg-vollie-blue hover:bg-vollie-blue/90"

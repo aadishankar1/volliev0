@@ -22,6 +22,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Upload } from "lucide-react";
 import { uploadMedia } from "@/services/uploadMedia";
+import AddressAutocomplete from "@/app/components/LocationTypehead";
 
 export default function VolunteerSignUp() {
   const [name, setName] = useState("");
@@ -38,29 +39,9 @@ export default function VolunteerSignUp() {
   const [location, setLocation] = useState<{ lat?: number; lng?: number }>({});
   const [locationError, setLocationError] = useState<string>("");
   const [avatar, setAvatar] = useState<string | null>(null);
-
-  useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        ({ coords }) => {
-          const { latitude, longitude } = coords;
-          setLocation({ lat: latitude, lng: longitude });
-          setLocationError("");
-        },
-        (error) => {
-          console.error("Geolocation error:", error);
-          setLocationError(
-            "Location access is required to help match you with nearby opportunities. " +
-            "Please enable location access in your browser settings and refresh the page."
-          );
-        }
-      );
-    } else {
-      setLocationError("Your browser doesn't support geolocation. Please try a different browser.");
-    }
-  }, []);
-
+  const [isLoading, setIsloading] = useState<null | boolean>(false);
   const router = useRouter();
+
   // const { toast } = useToast()
   const { createUser } = useAuth();
   const handleNext = () => {
@@ -92,6 +73,7 @@ export default function VolunteerSignUp() {
     }
   };
   const handleSubmit = async (e: React.FormEvent) => {
+
     e.preventDefault();
     if (password !== confirmPassword) {
       toast.error("Please ensure your passwords match.");
@@ -99,6 +81,7 @@ export default function VolunteerSignUp() {
     }
    
     try {
+      setIsloading(true)
       const createdUser = await createUser({
         email,
         pass: password,
@@ -111,13 +94,14 @@ export default function VolunteerSignUp() {
         lat: location.lat,
         lng: location.lng,
         linkedIn,
-        avatar,
+        img:avatar,
         intrests: selectedInterests,
       });
-
+      setIsloading(false)
       toast.success("Your volunteer account has been created successfully.");
       router.push("/profile");
     } catch (error: any) {
+      setIsloading(false)
       toast.error(`Error: ${error.message}`);
     }
   };
@@ -183,13 +167,21 @@ export default function VolunteerSignUp() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="location" className="text-sm font-medium">Location</Label>
-                  <Input
+                  {/* <Input
                     id="location"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     className="w-full px-3 py-2"
                     placeholder="Enter your address"
                     required
+                  /> */}
+                 <AddressAutocomplete
+                    className="w-full px-3 py-2"
+                    placeholder="Enter your organization's address"
+                    setLocation={setLocation}
+                    onPlaceSelected={(place) =>
+                      setAddress(place.formatted_address || "")
+                    }
                   />
                   {locationError && (
                     <p className="text-sm text-red-500 mt-1">{locationError}</p>
@@ -270,6 +262,7 @@ export default function VolunteerSignUp() {
                 setSelectedInterests={setSelectedInterests}
                 bio={bio}
                 setBio={setBio}
+                isLoading={isLoading}
               />
             )}
           </form>
