@@ -370,7 +370,7 @@ export default function ProfilePage() {
                         formErrors.name && "border-red-500"
                       )}
                     />
-                    <FormError message={formErrors.name} />
+                    <FormError message={formErrors.name || ""} />
                   </div>
                   <div>
                     <Label htmlFor="bio" className="text-sm font-medium text-vollie-blue">Bio</Label>
@@ -386,7 +386,7 @@ export default function ProfilePage() {
                       placeholder="Tell us about yourself..."
                     />
                     <div className="flex justify-between mt-1">
-                      <FormError message={formErrors.bio} />
+                      <FormError message={formErrors.bio||""} />
                       <span className="text-sm text-muted-foreground">
                         {editedUser.bio?.length || 0}/500
                       </span>
@@ -443,7 +443,7 @@ export default function ProfilePage() {
                       )}
                       placeholder={user?.userType === 1 ? "https://linkedin.com/company/yourorganization" : "https://linkedin.com/in/yourprofile"}
                     />
-                    <FormError message={formErrors.linkedIn} />
+                    <FormError message={formErrors.linkedIn||""} />
                   </div>
                   <div className="flex justify-end space-x-2 pt-4">
                     <Button

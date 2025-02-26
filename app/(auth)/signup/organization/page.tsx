@@ -22,6 +22,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Upload } from "lucide-react";
 import { uploadMedia } from "@/services/uploadMedia";
+import AddressAutocomplete from "@/app/components/LocationTypehead";
 
 export default function OrganizationSignUp() {
   const [name, setName] = useState("");
@@ -36,26 +37,28 @@ export default function OrganizationSignUp() {
   const [chooseIntrest, setChooseIntrest] = useState<Boolean>(false);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [bio, setBio] = useState("");
-  useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        ({ coords }) => {
-          const { latitude, longitude } = coords;
-          setLocation({ lat: latitude, lng: longitude });
-          setLocationError("");
-        },
-        (error) => {
-          console.error("Geolocation error:", error);
-          setLocationError(
-            "Location access is required to help volunteers find your opportunities. " +
-            "Please enable location access in your browser settings and refresh the page."
-          );
-        }
-      );
-    } else {
-      setLocationError("Your browser doesn't support geolocation. Please try a different browser.");
-    }
-  }, []);
+  // useEffect(() => {
+  //   if ("geolocation" in navigator) {
+  //     navigator.geolocation.getCurrentPosition(
+  //       ({ coords }) => {
+  //         const { latitude, longitude } = coords;
+  //         setLocation({ lat: latitude, lng: longitude });
+  //         setLocationError("");
+  //       },
+  //       (error) => {
+  //         console.error("Geolocation error:", error);
+  //         setLocationError(
+  //           "Location access is required to help volunteers find your opportunities. " +
+  //             "Please enable location access in your browser settings and refresh the page."
+  //         );
+  //       }
+  //     );
+  //   } else {
+  //     setLocationError(
+  //       "Your browser doesn't support geolocation. Please try a different browser."
+  //     );
+  //   }
+  // }, []);
   const router = useRouter();
   // const { toast } = useToast()
   const { createUser } = useAuth();
@@ -64,7 +67,7 @@ export default function OrganizationSignUp() {
     if (!(location.lat && location.lng)) {
       toast.error(
         "Location access is required to help volunteers find your opportunities. " +
-        "Please enable location access in your browser settings and refresh the page.",
+          "Please enable location access in your browser settings and refresh the page.",
         { autoClose: 5000 }
       );
       return;
@@ -92,7 +95,7 @@ export default function OrganizationSignUp() {
       toast.error("Please ensure your passwords match.");
       return;
     }
-   
+
     try {
       const createdUser = await createUser({
         email,
@@ -104,7 +107,7 @@ export default function OrganizationSignUp() {
         lat: location.lat,
         lng: location.lng,
         linkedIn,
-        avatar,
+        img: avatar,
         intrests: selectedInterests,
       });
 
@@ -129,9 +132,13 @@ export default function OrganizationSignUp() {
           <span className="text-3xl font-bold text-vollie-blue">Vollie</span>
         </Link>
       </div>
-      <Card className={chooseIntrest ? "" : "w-full max-w-md mx-auto shadow-lg"}>
+      <Card
+        className={chooseIntrest ? "" : "w-full max-w-md mx-auto shadow-lg"}
+      >
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Sign Up as Organization</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center">
+            Sign Up as Organization
+          </CardTitle>
           <CardDescription className="text-center">
             Create an account for your organization and start making an impact
           </CardDescription>
@@ -141,7 +148,9 @@ export default function OrganizationSignUp() {
             {!chooseIntrest ? (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-sm font-medium">Organization Name</Label>
+                  <Label htmlFor="name" className="text-sm font-medium">
+                    Organization Name
+                  </Label>
                   <Input
                     id="name"
                     value={name}
@@ -152,7 +161,9 @@ export default function OrganizationSignUp() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="avatar" className="text-sm font-medium">Organization Logo</Label>
+                  <Label htmlFor="avatar" className="text-sm font-medium">
+                    Organization Logo
+                  </Label>
                   <div className="flex items-center gap-4">
                     {avatar && (
                       <div className="relative w-16 h-16 rounded-full overflow-hidden">
@@ -179,7 +190,9 @@ export default function OrganizationSignUp() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium">Berkeley Email</Label>
+                  <Label htmlFor="email" className="text-sm font-medium">
+                    Berkeley Email
+                  </Label>
                   <Input
                     id="email"
                     type="email"
@@ -191,14 +204,16 @@ export default function OrganizationSignUp() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="location" className="text-sm font-medium">Location</Label>
-                  <Input
-                    id="location"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
+                  <Label htmlFor="location" className="text-sm font-medium">
+                    Location
+                  </Label>
+                  <AddressAutocomplete
                     className="w-full px-3 py-2"
                     placeholder="Enter your organization's address"
-                    required
+                    setLocation={setLocation}
+                    onPlaceSelected={(place) =>
+                      setAddress(place.formatted_address || "")
+                    }
                   />
                   {locationError && (
                     <p className="text-sm text-red-500 mt-1">{locationError}</p>
@@ -208,7 +223,9 @@ export default function OrganizationSignUp() {
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="linkedin" className="text-sm font-medium">LinkedIn Company Page (Optional)</Label>
+                  <Label htmlFor="linkedin" className="text-sm font-medium">
+                    LinkedIn Company Page (Optional)
+                  </Label>
                   <Input
                     id="linkedin"
                     type="url"
@@ -219,7 +236,9 @@ export default function OrganizationSignUp() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+                  <Label htmlFor="password" className="text-sm font-medium">
+                    Password
+                  </Label>
                   <Input
                     id="password"
                     type="password"
@@ -231,7 +250,12 @@ export default function OrganizationSignUp() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-sm font-medium">Confirm Password</Label>
+                  <Label
+                    htmlFor="confirmPassword"
+                    className="text-sm font-medium"
+                  >
+                    Confirm Password
+                  </Label>
                   <Input
                     id="confirmPassword"
                     type="password"
@@ -242,7 +266,11 @@ export default function OrganizationSignUp() {
                     required
                   />
                 </div>
-                <Button type="button" onClick={handleNext} className="w-full bg-vollie-blue hover:bg-vollie-blue/90">
+                <Button
+                  type="button"
+                  onClick={handleNext}
+                  className="w-full bg-vollie-blue hover:bg-vollie-blue/90"
+                >
                   Next
                 </Button>
               </>
@@ -259,7 +287,11 @@ export default function OrganizationSignUp() {
         <CardFooter className="flex flex-col items-center space-y-2">
           <p className="text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Button variant="link" onClick={() => router.push("/login")} className="text-vollie-blue hover:text-vollie-blue/90 p-0">
+            <Button
+              variant="link"
+              onClick={() => router.push("/login")}
+              className="text-vollie-blue hover:text-vollie-blue/90 p-0"
+            >
               Log in
             </Button>
           </p>
