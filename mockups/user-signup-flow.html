@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Initiative Sign-up Flow - User Perspective</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'vollie-blue': '#2563eb',
+            'vollie-light-blue': '#93c5fd',
+            'vollie-green': '#10b981',
+            'border': '#e5e7eb',
+            'muted-foreground': '#6b7280',
+            'background': '#f9fafb',
+            'card': '#ffffff',
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://cdn.jsdelivr.net/npm/lucide-icons@latest/font/lucide.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    .nav-link {
+      @apply px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors;
+    }
+    .nav-link.active {
+      @apply bg-vollie-blue text-white hover:bg-vollie-blue/90;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Navigation Bar -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 flex items-center">
+            <span class="text-vollie-blue text-2xl font-bold">Vollie</span>
+          </div>
+          <nav class="ml-6 flex space-x-2">
+            <a href="#" class="nav-link">Home</a>
+            <a href="#" class="nav-link active">Explore</a>
+            <a href="#" class="nav-link">Dashboard</a>
+            <a href="#" class="nav-link">Achievements</a>
+          </nav>
+        </div>
+        <div class="flex items-center">
+          <a href="#" class="nav-link flex items-center">
+            <i data-lucide="bell" class="h-5 w-5 mr-1"></i>
+            <span>Notifications</span>
+          </a>
+          <div class="ml-4 flex items-center">
+            <div class="h-8 w-8 rounded-full bg-vollie-light-blue flex items-center justify-center text-vollie-blue font-medium">
+              JS
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-900">User Sign-up Flow Demonstration</h1>
+      <p class="text-gray-600">This mockup demonstrates the complete user journey when signing up for volunteer initiatives.</p>
+    </div>
+
+    <!-- Step 1: Explore Page -->
+    <div class="mb-12 bg-white rounded-lg shadow overflow-hidden">
+      <div class="border-b border-gray-200 bg-gray-50 px-6 py-4">
+        <h2 class="text-lg font-medium text-gray-900 flex items-center">
+          <span class="flex items-center justify-center w-7 h-7 rounded-full bg-vollie-blue text-white mr-2 text-sm font-semibold">1</span>
+          Explore Page
+        </h2>
+        <p class="mt-1 text-sm text-gray-500">Browse available volunteer initiatives</p>
+      </div>
+
+      <div class="p-6">
+        <!-- Search and Filter Area -->
+        <div class="mb-6">
+          <div class="flex flex-col sm:flex-row gap-4">
+            <div class="relative flex-1">
+              <input type="text" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-vollie-blue focus:border-vollie-blue" placeholder="Search opportunities...">
+              <span class="absolute left-3 top-2.5 text-gray-400">
+                <i data-lucide="search" class="w-5 h-5"></i>
+              </span>
+            </div>
+            <button class="px-4 py-2 bg-vollie-blue text-white rounded-md shadow-sm hover:bg-vollie-blue/90 flex items-center justify-center gap-2">
+              <i data-lucide="filter" class="w-4 h-4"></i>
+              Filters
+            </button>
+          </div>
+        </div>
+
+        <!-- Initiative Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Initiative Card 1 -->
+          <div class="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+            <div class="h-40 bg-gray-200 relative">
+              <img src="https://images.unsplash.com/photo-1469571486292-b53cadbe5ddf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=640&q=80" 
+                  alt="Beach Cleanup" class="w-full h-full object-cover">
+            </div>
+            <div class="p-4">
+              <h3 class="text-lg font-semibold text-gray-900 hover:text-vollie-blue">Beach Cleanup Initiative</h3>
+              <p class="text-sm text-gray-600 mb-2">Ocean Conservation Society</p>
+              
+              <div class="flex items-center text-sm text-gray-500 mb-2">
+                <i data-lucide="map-pin" class="h-4 w-4 mr-1 text-vollie-green"></i>
+                Santa Monica Beach, CA
+              </div>
+              
+              <div class="flex items-center text-sm text-gray-500 mb-2">
+                <i data-lucide="calendar" class="h-4 w-4 mr-1 text-vollie-green"></i>
+                July 15, 2023
+              </div>
+              
+              <div class="flex items-center text-sm text-gray-500 mb-2">
+                <i data-lucide="clock" class="h-4 w-4 mr-1 text-vollie-green"></i>
+                4 hours
+              </div>
+              
+              <div class="flex items-center text-sm text-gray-500 mb-2">
+                <i data-lucide="users" class="h-4 w-4 mr-1 text-vollie-green"></i>
+                12 / 30 volunteers
+              </div>
+              
+              <div class="flex flex-wrap gap-2 mt-3">
+                <span class="bg-vollie-light-blue/20 text-vollie-blue text-xs px-2 py-1 rounded-full">Environment</span>
+                <span class="bg-vollie-light-blue/20 text-vollie-blue text-xs px-2 py-1 rounded-full">Outdoors</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Initiative Card 2 -->
+          <div class="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+            <div class="h-40 bg-gray-200 relative">
+              <img src="https://images.unsplash.com/photo-1576267423445-b2e0074d68a4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=640&q=80" 
+                  alt="Food Drive" class="w-full h-full object-cover">
+            </div>
+            <div class="p-4">
+              <h3 class="text-lg font-semibold text-gray-900 hover:text-vollie-blue">Food Bank Assistance</h3>
+              <p class="text-sm text-gray-600 mb-2">Community Food Network</p>
+              
+              <div class="flex items-center text-sm text-gray-500 mb-2">
+                <i data-lucide="map-pin" class="h-4 w-4 mr-1 text-vollie-green"></i>
+                Downtown Food Bank, Berkeley
+              </div>
+              
+              <div class="flex items-center text-sm text-gray-500 mb-2">
+                <i data-lucide="calendar" class="h-4 w-4 mr-1 text-vollie-green"></i>
+                August 5, 2023
+              </div>
+              
+              <div class="flex items-center text-sm text-gray-500 mb-2">
+                <i data-lucide="clock" class="h-4 w-4 mr-1 text-vollie-green"></i>
+                3 hours
+              </div>
+              
+              <div class="flex items-center text-sm text-gray-500 mb-2">
+                <i data-lucide="users" class="h-4 w-4 mr-1 text-vollie-green"></i>
+                8 / 15 volunteers
+              </div>
+              
+              <div class="flex flex-wrap gap-2 mt-3">
+                <span class="bg-vollie-light-blue/20 text-vollie-blue text-xs px-2 py-1 rounded-full">Food Security</span>
+                <span class="bg-vollie-light-blue/20 text-vollie-blue text-xs px-2 py-1 rounded-full">Community</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Initiative Card 3 -->
+          <div class="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+            <div class="h-40 bg-gray-200 relative">
+              <img src="https://images.unsplash.com/photo-1517486808906-6ca8b3f8e1c1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=640&q=80" 
+                  alt="Tutoring" class="w-full h-full object-cover">
+            </div>
+            <div class="p-4">
+              <h3 class="text-lg font-semibold text-gray-900 hover:text-vollie-blue">After-School Tutoring</h3>
+              <p class="text-sm text-gray-600 mb-2">Education First</p>
+              
+              <div class="flex items-center text-sm text-gray-500 mb-2">
+                <i data-lucide="map-pin" class="h-4 w-4 mr-1 text-vollie-green"></i>
+                Jefferson Elementary School
+              </div>
+              
+              <div class="flex items-center text-sm text-gray-500 mb-2">
+                <i data-lucide="calendar" class="h-4 w-4 mr-1 text-vollie-green"></i>
+                September 10, 2023
+              </div>
+              
+              <div class="flex items-center text-sm text-gray-500 mb-2">
+                <i data-lucide="clock" class="h-4 w-4 mr-1 text-vollie-green"></i>
+                2 hours/week
+              </div>
+              
+              <div class="flex items-center text-sm text-gray-500 mb-2">
+                <i data-lucide="users" class="h-4 w-4 mr-1 text-vollie-green"></i>
+                5 / 20 volunteers
+              </div>
+              
+              <div class="flex flex-wrap gap-2 mt-3">
+                <span class="bg-vollie-light-blue/20 text-vollie-blue text-xs px-2 py-1 rounded-full">Education</span>
+                <span class="bg-vollie-light-blue/20 text-vollie-blue text-xs px-2 py-1 rounded-full">Children</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Initiative Details Dialog -->
+    <div class="mb-12 bg-white rounded-lg shadow overflow-hidden">
+      <div class="border-b border-gray-200 bg-gray-50 px-6 py-4">
+        <h2 class="text-lg font-medium text-gray-900 flex items-center">
+          <span class="flex items-center justify-center w-7 h-7 rounded-full bg-vollie-blue text-white mr-2 text-sm font-semibold">2</span>
+          Initiative Details
+        </h2>
+        <p class="mt-1 text-sm text-gray-500">View detailed information and sign up</p>
+      </div>
+
+      <div class="p-6">
+        <div class="fixed inset-0 bg-black/40 flex items-center justify-center" style="position: relative; z-index: 10; background: none;">
+          <div class="bg-white rounded-lg shadow-lg max-w-3xl w-full mx-4 overflow-hidden" style="max-height: 90vh; overflow-y: auto;">
+            <!-- Dialog Header -->
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+              <h2 class="text-xl font-semibold text-gray-900">Beach Cleanup Initiative</h2>
+              <button class="text-gray-400 hover:text-gray-500">
+                <i data-lucide="x" class="h-5 w-5"></i>
+              </button>
+            </div>
+            
+            <!-- Dialog Body -->
+            <div class="px-6 py-4">
+              <!-- Initiative Image -->
+              <div class="mb-6">
+                <img src="https://images.unsplash.com/photo-1469571486292-b53cadbe5ddf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1280&q=80" 
+                     alt="Beach Cleanup" class="w-full h-64 object-cover rounded-lg">
+              </div>
+              
+              <!-- Organization Info -->
+              <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-1">Ocean Conservation Society</h3>
+                <p class="text-gray-600 mb-4">
+                  Ocean Conservation Society is dedicated to protecting marine ecosystems through education, 
+                  research, and community action. We work with local communities to promote sustainable 
+                  practices and organize regular cleanup initiatives.
+                </p>
+              </div>
+              
+              <!-- Initiative Details -->
+              <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-1">About this Initiative</h3>
+                <p class="text-gray-600 mb-4">
+                  Join us for our monthly beach cleanup event! We'll be removing trash and debris from 
+                  Santa Monica Beach to protect marine life and keep our beaches beautiful. All cleaning 
+                  supplies will be provided. Please wear comfortable clothes and sun protection.
+                </p>
+              </div>
+              
+              <!-- Details Grid -->
+              <div class="grid grid-cols-2 gap-6 mb-6">
+                <div>
+                  <h4 class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Location</h4>
+                  <div class="flex items-center gap-2">
+                    <i data-lucide="map-pin" class="h-5 w-5 text-vollie-green"></i>
+                    <span class="text-gray-900">Santa Monica Beach, CA</span>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Date</h4>
+                  <div class="flex items-center gap-2">
+                    <i data-lucide="calendar" class="h-5 w-5 text-vollie-green"></i>
+                    <span class="text-gray-900">July 15, 2023</span>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Time Commitment</h4>
+                  <div class="flex items-center gap-2">
+                    <i data-lucide="clock" class="h-5 w-5 text-vollie-green"></i>
+                    <span class="text-gray-900">4 hours (9 AM - 1 PM)</span>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Volunteers</h4>
+                  <div class="flex items-center gap-2">
+                    <i data-lucide="users" class="h-5 w-5 text-vollie-green"></i>
+                    <span class="text-gray-900">12 / 30 signed up</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mb-4">
+                <h4 class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Categories</h4>
+                <div class="flex flex-wrap gap-2">
+                  <span class="bg-vollie-light-blue/20 text-vollie-blue text-xs px-2 py-1 rounded-full">Environment</span>
+                  <span class="bg-vollie-light-blue/20 text-vollie-blue text-xs px-2 py-1 rounded-full">Outdoors</span>
+                  <span class="bg-vollie-light-blue/20 text-vollie-blue text-xs px-2 py-1 rounded-full">Community</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Dialog Footer -->
+            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
+              <button class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                <i data-lucide="share-2" class="w-4 h-4"></i>
+                Share
+              </button>
+              <button class="px-4 py-2 bg-vollie-blue text-white rounded-md hover:bg-vollie-blue/90 flex items-center gap-2">
+                <i data-lucide="user-plus" class="w-4 h-4"></i>
+                Sign Up
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Sign-up Confirmation Toast -->
+    <div class="mb-12 bg-white rounded-lg shadow overflow-hidden">
+      <div class="border-b border-gray-200 bg-gray-50 px-6 py-4">
+        <h2 class="text-lg font-medium text-gray-900 flex items-center">
+          <span class="flex items-center justify-center w-7 h-7 rounded-full bg-vollie-blue text-white mr-2 text-sm font-semibold">3</span>
+          Sign-up Confirmation
+        </h2>
+        <p class="mt-1 text-sm text-gray-500">Confirmation notification appears after signing up</p>
+      </div>
+
+      <div class="p-6 relative">
+        <div class="fixed bottom-4 right-4" style="position: relative;">
+          <div class="bg-white border border-gray-200 shadow-lg rounded-lg p-4 max-w-sm w-full animate-enter">
+            <div class="flex gap-3">
+              <div class="flex-shrink-0 bg-vollie-blue/10 rounded-full p-2">
+                <i data-lucide="user-plus" class="h-5 w-5 text-vollie-blue"></i>
+              </div>
+              <div class="flex-1">
+                <h3 class="font-medium text-gray-900">Sign-up Request Sent</h3>
+                <p class="text-sm text-gray-600 mt-1">
+                  Your request to join "Beach Cleanup Initiative" has been sent to Ocean Conservation Society.
+                </p>
+              </div>
+              <button class="flex-shrink-0 text-gray-400 hover:text-gray-500">
+                <i data-lucide="x" class="h-5 w-5"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Notifications Page -->
+    <div class="mb-12 bg-white rounded-lg shadow overflow-hidden">
+      <div class="border-b border-gray-200 bg-gray-50 px-6 py-4">
+        <h2 class="text-lg font-medium text-gray-900 flex items-center">
+          <span class="flex items-center justify-center w-7 h-7 rounded-full bg-vollie-blue text-white mr-2 text-sm font-semibold">4</span>
+          Notifications
+        </h2>
+        <p class="mt-1 text-sm text-gray-500">View the status of your initiative sign-up requests</p>
+      </div>
+
+      <div class="p-6">
+        <h3 class="text-xl font-semibold text-gray-900 mb-6">My Notifications</h3>
+        
+        <div class="space-y-4">
+          <!-- Pending Notification -->
+          <div class="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+            <div class="flex space-x-4">
+              <div class="flex-shrink-0">
+                <div class="p-2 bg-yellow-100 rounded-full">
+                  <i data-lucide="user-plus" class="h-5 w-5 text-yellow-600"></i>
+                </div>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <h4 class="text-lg font-medium text-gray-900">Beach Cleanup Initiative</h4>
+                  <span class="text-sm text-gray-500">Just now</span>
+                </div>
+                <p class="mt-1 text-gray-600">
+                  You've requested to join "Beach Cleanup Initiative" organized by Ocean Conservation Society. 
+                </p>
+                <div class="mt-2 flex items-center space-x-2">
+                  <span class="px-2.5 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">
+                    Pending
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Accepted Notification -->
+          <div class="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+            <div class="flex space-x-4">
+              <div class="flex-shrink-0">
+                <div class="p-2 bg-green-100 rounded-full">
+                  <i data-lucide="check-circle" class="h-5 w-5 text-green-600"></i>
+                </div>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <h4 class="text-lg font-medium text-gray-900">Food Bank Assistance</h4>
+                  <span class="text-sm text-gray-500">2 days ago</span>
+                </div>
+                <p class="mt-1 text-gray-600">
+                  Community Food Network has accepted your request to join "Food Bank Assistance". 
+                </p>
+                <div class="mt-2 flex items-center space-x-2">
+                  <span class="px-2.5 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                    Accepted
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Declined Notification -->
+          <div class="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+            <div class="flex space-x-4">
+              <div class="flex-shrink-0">
+                <div class="p-2 bg-red-100 rounded-full">
+                  <i data-lucide="x-circle" class="h-5 w-5 text-red-600"></i>
+                </div>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <h4 class="text-lg font-medium text-gray-900">After-School Tutoring</h4>
+                  <span class="text-sm text-gray-500">1 week ago</span>
+                </div>
+                <p class="mt-1 text-gray-600">
+                  Education First has declined your request to join "After-School Tutoring".
+                </p>
+                <div class="mt-2 flex items-center space-x-2">
+                  <span class="px-2.5 py-0.5 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+                    Declined
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html> 

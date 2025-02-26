@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Initiative Management Flow - Organization Perspective</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'vollie-blue': '#2563eb',
+            'vollie-light-blue': '#93c5fd',
+            'vollie-green': '#10b981',
+            'border': '#e5e7eb',
+            'muted-foreground': '#6b7280',
+            'background': '#f9fafb',
+            'card': '#ffffff',
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://cdn.jsdelivr.net/npm/lucide-icons@latest/font/lucide.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    .nav-link {
+      @apply px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 transition-colors;
+    }
+    .nav-link.active {
+      @apply bg-vollie-blue text-white hover:bg-vollie-blue/90;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Navigation Bar -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <div class="flex-shrink-0 flex items-center">
+            <span class="text-vollie-blue text-2xl font-bold">Vollie</span>
+          </div>
+          <nav class="ml-6 flex space-x-2">
+            <a href="#" class="nav-link">Home</a>
+            <a href="#" class="nav-link">Initiatives</a>
+            <a href="#" class="nav-link active">Dashboard</a>
+            <a href="#" class="nav-link">Analytics</a>
+          </nav>
+        </div>
+        <div class="flex items-center">
+          <a href="#" class="nav-link flex items-center">
+            <i data-lucide="bell" class="h-5 w-5 mr-1"></i>
+            <span>Notifications</span>
+          </a>
+          <div class="ml-4 flex items-center">
+            <div class="h-8 w-8 rounded-full bg-vollie-light-blue flex items-center justify-center text-vollie-blue font-medium">
+              OC
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-900">Organization Management Flow</h1>
+      <p class="text-gray-600">This mockup demonstrates how organizations manage volunteer sign-up requests.</p>
+    </div>
+
+    <!-- Step 1: Organization Notification Panel -->
+    <div class="mb-12 bg-white rounded-lg shadow overflow-hidden">
+      <div class="border-b border-gray-200 bg-gray-50 px-6 py-4">
+        <h2 class="text-lg font-medium text-gray-900 flex items-center">
+          <span class="flex items-center justify-center w-7 h-7 rounded-full bg-vollie-blue text-white mr-2 text-sm font-semibold">1</span>
+          Notification Panel
+        </h2>
+        <p class="mt-1 text-sm text-gray-500">View and manage sign-up requests from volunteers</p>
+      </div>
+
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-semibold text-gray-900">Notifications</h3>
+          <button class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+            Mark all as read
+          </button>
+        </div>
+        
+        <div class="space-y-4">
+          <!-- New Volunteer Sign-up Request -->
+          <div class="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+            <div class="flex space-x-4">
+              <div class="flex-shrink-0">
+                <div class="p-2 bg-yellow-100 rounded-full">
+                  <i data-lucide="user-plus" class="h-5 w-5 text-yellow-600"></i>
+                </div>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <h4 class="text-lg font-medium text-gray-900">Beach Cleanup Initiative</h4>
+                  <span class="text-sm text-gray-500">Just now</span>
+                </div>
+                <p class="mt-1 text-gray-600">
+                  John Doe has requested to join your "Beach Cleanup Initiative" scheduled on July 15, 2023.
+                </p>
+                <div class="mt-3 flex items-center justify-between">
+                  <span class="px-2.5 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">
+                    Pending
+                  </span>
+                  <div class="flex gap-2">
+                    <button class="px-3 py-1 border border-red-500 text-red-500 rounded-md text-sm hover:bg-red-50 flex items-center gap-1">
+                      <i data-lucide="x" class="h-4 w-4"></i>
+                      Reject
+                    </button>
+                    <button class="px-3 py-1 border border-vollie-blue text-vollie-blue rounded-md text-sm hover:bg-vollie-blue/10 flex items-center gap-1">
+                      <i data-lucide="check" class="h-4 w-4"></i>
+                      Accept
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Another Volunteer Sign-up Request -->
+          <div class="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+            <div class="flex space-x-4">
+              <div class="flex-shrink-0">
+                <div class="p-2 bg-yellow-100 rounded-full">
+                  <i data-lucide="user-plus" class="h-5 w-5 text-yellow-600"></i>
+                </div>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <h4 class="text-lg font-medium text-gray-900">Food Bank Assistance</h4>
+                  <span class="text-sm text-gray-500">2 hours ago</span>
+                </div>
+                <p class="mt-1 text-gray-600">
+                  Jane Smith has requested to join your "Food Bank Assistance" scheduled on August 5, 2023.
+                </p>
+                <div class="mt-3 flex items-center justify-between">
+                  <span class="px-2.5 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">
+                    Pending
+                  </span>
+                  <div class="flex gap-2">
+                    <button class="px-3 py-1 border border-red-500 text-red-500 rounded-md text-sm hover:bg-red-50 flex items-center gap-1">
+                      <i data-lucide="x" class="h-4 w-4"></i>
+                      Reject
+                    </button>
+                    <button class="px-3 py-1 border border-vollie-blue text-vollie-blue rounded-md text-sm hover:bg-vollie-blue/10 flex items-center gap-1">
+                      <i data-lucide="check" class="h-4 w-4"></i>
+                      Accept
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Initiative Reminder -->
+          <div class="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+            <div class="flex space-x-4">
+              <div class="flex-shrink-0">
+                <div class="p-2 bg-blue-100 rounded-full">
+                  <i data-lucide="bell" class="h-5 w-5 text-blue-600"></i>
+                </div>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <h4 class="text-lg font-medium text-gray-900">Initiative Reminder</h4>
+                  <span class="text-sm text-gray-500">1 day ago</span>
+                </div>
+                <p class="mt-1 text-gray-600">
+                  Your initiative "Beach Cleanup" is scheduled for tomorrow. Make sure all preparations are complete.
+                </p>
+                <div class="mt-3 flex items-center">
+                  <span class="px-2.5 py-0.5 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                    Reminder
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Accept Confirmation -->
+    <div class="mb-12 bg-white rounded-lg shadow overflow-hidden">
+      <div class="border-b border-gray-200 bg-gray-50 px-6 py-4">
+        <h2 class="text-lg font-medium text-gray-900 flex items-center">
+          <span class="flex items-center justify-center w-7 h-7 rounded-full bg-vollie-blue text-white mr-2 text-sm font-semibold">2</span>
+          Accept Confirmation
+        </h2>
+        <p class="mt-1 text-sm text-gray-500">Confirmation after accepting a volunteer's request</p>
+      </div>
+
+      <div class="p-6 relative">
+        <div class="fixed bottom-4 right-4" style="position: relative;">
+          <div class="bg-white border border-gray-200 shadow-lg rounded-lg p-4 max-w-sm w-full animate-enter">
+            <div class="flex gap-3">
+              <div class="flex-shrink-0 bg-green-100 rounded-full p-2">
+                <i data-lucide="check-circle" class="h-5 w-5 text-green-600"></i>
+              </div>
+              <div class="flex-1">
+                <h3 class="font-medium text-gray-900">Volunteer Request Accepted</h3>
+                <p class="text-sm text-gray-600 mt-1">
+                  You've accepted John Doe's request to join "Beach Cleanup Initiative".
+                </p>
+              </div>
+              <button class="flex-shrink-0 text-gray-400 hover:text-gray-500">
+                <i data-lucide="x" class="h-5 w-5"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Updated Notification State -->
+    <div class="mb-12 bg-white rounded-lg shadow overflow-hidden">
+      <div class="border-b border-gray-200 bg-gray-50 px-6 py-4">
+        <h2 class="text-lg font-medium text-gray-900 flex items-center">
+          <span class="flex items-center justify-center w-7 h-7 rounded-full bg-vollie-blue text-white mr-2 text-sm font-semibold">3</span>
+          Updated Notification State
+        </h2>
+        <p class="mt-1 text-sm text-gray-500">Notification updated after decision</p>
+      </div>
+
+      <div class="p-6">
+        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+          <div class="flex space-x-4">
+            <div class="flex-shrink-0">
+              <div class="p-2 bg-green-100 rounded-full">
+                <i data-lucide="check-circle" class="h-5 w-5 text-green-600"></i>
+              </div>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <h4 class="text-lg font-medium text-gray-900">Beach Cleanup Initiative</h4>
+                <span class="text-sm text-gray-500">Just now</span>
+              </div>
+              <p class="mt-1 text-gray-600">
+                You've accepted John Doe's request to join "Beach Cleanup Initiative" scheduled on July 15, 2023. 
+              </p>
+              <div class="mt-3 flex items-center">
+                <span class="px-2.5 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                  Accepted
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Initiative Management Panel -->
+    <div class="mb-12 bg-white rounded-lg shadow overflow-hidden">
+      <div class="border-b border-gray-200 bg-gray-50 px-6 py-4">
+        <h2 class="text-lg font-medium text-gray-900 flex items-center">
+          <span class="flex items-center justify-center w-7 h-7 rounded-full bg-vollie-blue text-white mr-2 text-sm font-semibold">4</span>
+          Initiative Management
+        </h2>
+        <p class="mt-1 text-sm text-gray-500">Comprehensive view of initiative volunteers</p>
+      </div>
+
+      <div class="p-6">
+        <!-- Initiative Header -->
+        <div class="mb-6">
+          <h3 class="text-xl font-semibold text-gray-900">Beach Cleanup Initiative</h3>
+          <p class="text-gray-600">Manage volunteers and sign-up requests</p>
+        </div>
+        
+        <!-- Tabs -->
+        <div class="border-b border-gray-200 mb-6">
+          <div class="flex -mb-px">
+            <button class="px-4 py-2 text-vollie-blue border-b-2 border-vollie-blue font-medium">
+              Volunteers
+            </button>
+            <button class="px-4 py-2 text-gray-500 hover:text-gray-700 border-b-2 border-transparent">
+              Details
+            </button>
+            <button class="px-4 py-2 text-gray-500 hover:text-gray-700 border-b-2 border-transparent">
+              Analytics
+            </button>
+          </div>
+        </div>
+        
+        <!-- Volunteer Management Content -->
+        <div class="space-y-6">
+          <!-- Capacity Stats -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+              <div class="text-sm text-gray-500 mb-1">Current Volunteers</div>
+              <div class="text-2xl font-bold text-gray-900">13 <span class="text-gray-500 text-lg font-normal">/ 30</span></div>
+            </div>
+            <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+              <div class="text-sm text-gray-500 mb-1">Pending Requests</div>
+              <div class="text-2xl font-bold text-gray-900">3</div>
+            </div>
+            <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+              <div class="text-sm text-gray-500 mb-1">Days Until Event</div>
+              <div class="text-2xl font-bold text-gray-900">12</div>
+            </div>
+          </div>
+          
+          <!-- Pending Requests Section -->
+          <div>
+            <h4 class="text-lg font-medium text-gray-900 mb-4">Pending Requests</h4>
+            <div class="border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Volunteer</th>
+                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Request Date</th>
+                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Experience</th>
+                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr>
+                    <td class="px-4 py-3">
+                      <div class="flex items-center">
+                        <div class="h-8 w-8 rounded-full bg-vollie-light-blue flex items-center justify-center text-vollie-blue font-medium">
+                          JS
+                        </div>
+                        <div class="ml-3">
+                          <div class="text-sm font-medium text-gray-900">Jane Smith</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-500">July 2, 2023</td>
+                    <td class="px-4 py-3 text-sm text-gray-500">None</td>
+                    <td class="px-4 py-3 text-sm">
+                      <div class="flex gap-2">
+                        <button class="px-3 py-1 border border-red-500 text-red-500 rounded-md text-sm hover:bg-red-50 flex items-center gap-1">
+                          <i data-lucide="x" class="h-4 w-4"></i>
+                          Reject
+                        </button>
+                        <button class="px-3 py-1 border border-vollie-blue text-vollie-blue rounded-md text-sm hover:bg-vollie-blue/10 flex items-center gap-1">
+                          <i data-lucide="check" class="h-4 w-4"></i>
+                          Accept
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3">
+                      <div class="flex items-center">
+                        <div class="h-8 w-8 rounded-full bg-vollie-light-blue flex items-center justify-center text-vollie-blue font-medium">
+                          TW
+                        </div>
+                        <div class="ml-3">
+                          <div class="text-sm font-medium text-gray-900">Tom Wilson</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-500">July 3, 2023</td>
+                    <td class="px-4 py-3 text-sm text-gray-500">Previous beach cleanups</td>
+                    <td class="px-4 py-3 text-sm">
+                      <div class="flex gap-2">
+                        <button class="px-3 py-1 border border-red-500 text-red-500 rounded-md text-sm hover:bg-red-50 flex items-center gap-1">
+                          <i data-lucide="x" class="h-4 w-4"></i>
+                          Reject
+                        </button>
+                        <button class="px-3 py-1 border border-vollie-blue text-vollie-blue rounded-md text-sm hover:bg-vollie-blue/10 flex items-center gap-1">
+                          <i data-lucide="check" class="h-4 w-4"></i>
+                          Accept
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <!-- Confirmed Volunteers Section -->
+          <div>
+            <h4 class="text-lg font-medium text-gray-900 mb-4">Confirmed Volunteers</h4>
+            <div class="border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Volunteer</th>
+                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Accepted Date</th>
+                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Experience</th>
+                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr>
+                    <td class="px-4 py-3">
+                      <div class="flex items-center">
+                        <div class="h-8 w-8 rounded-full bg-vollie-light-blue flex items-center justify-center text-vollie-blue font-medium">
+                          JD
+                        </div>
+                        <div class="ml-3">
+                          <div class="text-sm font-medium text-gray-900">John Doe</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-500">July 1, 2023</td>
+                    <td class="px-4 py-3 text-sm text-gray-500">2 previous events</td>
+                    <td class="px-4 py-3 text-sm">
+                      <span class="px-2.5 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                        Confirmed
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3">
+                      <div class="flex items-center">
+                        <div class="h-8 w-8 rounded-full bg-vollie-light-blue flex items-center justify-center text-vollie-blue font-medium">
+                          EJ
+                        </div>
+                        <div class="ml-3">
+                          <div class="text-sm font-medium text-gray-900">Emily Johnson</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-500">June 29, 2023</td>
+                    <td class="px-4 py-3 text-sm text-gray-500">None specified</td>
+                    <td class="px-4 py-3 text-sm">
+                      <span class="px-2.5 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                        Confirmed
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3">
+                      <div class="flex items-center">
+                        <div class="h-8 w-8 rounded-full bg-vollie-light-blue flex items-center justify-center text-vollie-blue font-medium">
+                          MB
+                        </div>
+                        <div class="ml-3">
+                          <div class="text-sm font-medium text-gray-900">Michael Brown</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-500">June 27, 2023</td>
+                    <td class="px-4 py-3 text-sm text-gray-500">Environmental volunteer</td>
+                    <td class="px-4 py-3 text-sm">
+                      <span class="px-2.5 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                        Confirmed
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html> 
