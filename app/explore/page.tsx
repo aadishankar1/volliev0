@@ -212,7 +212,6 @@ export default function ExplorePage() {
     refetch();
   }, [debouncedFilters]);
   const filteredOpportunities: any = apiData?.pages;
-  console.log("dsgdf",apiData)
   const observerRef = useRef<IntersectionObserver | null>(null);
   const lastItemRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -244,10 +243,10 @@ export default function ExplorePage() {
           `Your request to join "${opportunity.title}" has been sent to ${opportunity.organization}.`
         );
         setSelectedOpportunity(null);
-      } catch (error) {
-        console.error("Failed to sign up for initiative:", error);
+      } catch (error:any) {
+        console.log("Failed to sign up for initiative:", error);
         toast.error(
-          "Failed to sign up for the initiative. Please try again later."
+          `${error}`
         );
       }
     },
@@ -489,7 +488,6 @@ export default function ExplorePage() {
                       <NoOpportunitiesCard />
                     </div>
                   )}
-                  {/* {console.log(apiData)} */}
                   { apiData && apiData.pages?.[0]?.length > 0 && (
                     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                       {apiData?.pages?.map((page, pageIndex) =>

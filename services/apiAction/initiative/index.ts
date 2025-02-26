@@ -45,7 +45,7 @@ export const signupInitiative = async (data: {
   }
 };
 
-export const assignInitiativeList = async (): Promise<Initiative[]> => {
+export const assignInitiativeList = async (): Promise<any> => {
   try {
     const endpoint = endpoints.assignInitiative;
     const res: InitiativeResponse = await request(endpoint, "GET");
