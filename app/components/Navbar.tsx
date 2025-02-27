@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { LogOut, Globe, Bell, User, Plus, Award } from "lucide-react"
+import { LogOut, Globe, Bell, Trophy, User, Plus, Award, Users, MessageSquare, Menu } from "lucide-react"
 import { useAuth } from "../context/AuthContext"
 import Image from "next/image"
 import { motion } from "framer-motion"
@@ -41,7 +41,7 @@ const Navbar = () => {
             <Link href="/explore" className="flex items-center space-x-2">
               <Image
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Copy_of_Volunteen_Logo-removebg-preview-RiE6TyzfOc1innz0Iud7ZxghahIAY0.png"
-                alt="Vollie Logo"
+                alt="Volunteen Logo"
                 width={40}
                 height={40}
                 className="w-auto h-8"
@@ -51,6 +51,9 @@ const Navbar = () => {
             <div className="hidden md:flex space-x-1">
               <NavLink href="/explore" current={pathname} icon={<Globe className="h-4 w-4" />}>
                 Explore
+              </NavLink>
+              <NavLink href="/social" current={pathname} icon={<Users className="h-4 w-4" />}>
+                Social
               </NavLink>
               <NavLink href="/notifications" current={pathname} icon={<Bell className="h-4 w-4" />}>
                 Notifications
@@ -104,8 +107,14 @@ const Navbar = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="grid grid-cols-4 h-full">
+        <div className="grid grid-cols-5 h-full">
           <MobileNavLink href="/explore" current={pathname} icon={<Globe className="h-6 w-6" />} label="Explore" />
+          <MobileNavLink
+            href="/social"
+            current={pathname}
+            icon={<MessageSquare className="h-6 w-6" />}
+            label="Social"
+          />
           <MobileNavLink
             href="/notifications"
             current={pathname}
@@ -125,6 +134,7 @@ const Navbar = () => {
               label="Add Initiative"
             />
           )}
+          <MobileNavLink href="/menu" current={pathname} icon={<Menu className="h-6 w-6" />} label="Menu" />
         </div>
       </motion.nav>
     </>
