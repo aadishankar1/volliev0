@@ -15,7 +15,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, UserCheck } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "react-toastify";
@@ -43,6 +43,7 @@ export function AddInitiativeForm({ onClose }: AddInitiativeFormProps) {
   const [description, setDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [isOpenInvite, setIsOpenInvite] = useState(false);
 
   const router = useRouter();
   const { user, updateProfile } = useAuth();
@@ -81,6 +82,7 @@ export function AddInitiativeForm({ onClose }: AddInitiativeFormProps) {
         status: 0,
         isOnCampus,
         interests: selectedInterests,
+        isOpenInvite,
       };
       if (address && !isOnCampus) {
         const data = await getLatLng(address);
@@ -246,6 +248,26 @@ export function AddInitiativeForm({ onClose }: AddInitiativeFormProps) {
           onChange={(e) => setVolunteersNeeded(e.target.value)}
           required
         />
+      </div>
+
+      {/* Open-Invite Toggle */}
+      <div className="space-y-2 p-4 border rounded-md bg-muted/30">
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <div className="flex items-center">
+              <UserCheck className="h-4 w-4 mr-2 text-vollie-blue" />
+              <Label htmlFor="open-invite" className="font-medium">Open Invite</Label>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Automatically approve all volunteer applications
+            </p>
+          </div>
+          <Switch
+            id="open-invite"
+            checked={isOpenInvite}
+            onCheckedChange={setIsOpenInvite}
+          />
+        </div>
       </div>
 
       <div className="space-y-4">

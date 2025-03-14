@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vollie Platform Changes Summary</title>
+    <style>
+        :root {
+            --vollie-blue: #3B82F6;
+            --vollie-light-blue: #93C5FD;
+            --vollie-green: #10B981;
+            --border-color: #E5E7EB;
+            --bg-color: #F9FAFB;
+            --text-color: #1F2937;
+            --muted-text: #6B7280;
+            --card-bg: #FFFFFF;
+            --code-bg: #F3F4F6;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --border-color: #374151;
+                --bg-color: #111827;
+                --text-color: #F9FAFB;
+                --muted-text: #9CA3AF;
+                --card-bg: #1F2937;
+                --code-bg: #111827;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h1 {
+            color: var(--vollie-blue);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        h2 {
+            color: var(--vollie-blue);
+            font-size: 1.8rem;
+            margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            margin: 1.5rem 0 0.75rem;
+            color: var(--vollie-blue);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        .feature-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .feature-card h3 {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .feature-card h3 svg {
+            color: var(--vollie-blue);
+        }
+
+        .feature-details {
+            margin-top: 1rem;
+        }
+
+        .code-block {
+            background-color: var(--code-bg);
+            border-radius: 0.25rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .screenshot {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.25rem;
+            margin: 1rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: var(--vollie-light-blue);
+            color: var(--vollie-blue);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .implementation-notes {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid var(--vollie-green);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 0.25rem 0.25rem 0;
+        }
+
+        .implementation-notes h4 {
+            color: var(--vollie-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .before-after {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .before-after > div {
+            flex: 1;
+        }
+
+        .before-after h4 {
+            margin-bottom: 0.5rem;
+            color: var(--muted-text);
+        }
+
+        @media (max-width: 768px) {
+            .before-after {
+                flex-direction: column;
+            }
+        }
+
+        .muted {
+            color: var(--muted-text);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Vollie Platform Changes Summary</h1>
+            <p class="muted">This document outlines all changes made to the Vollie platform since the previous build, to help backend developers implement these features.</p>
+        </header>
+
+        <main>
+            <section>
+                <h2>1. Landing Animation Fix</h2>
+                <div class="feature-card">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v8"></path><path d="m4.93 10.93 1.41 1.41"></path><path d="M2 18h2"></path><path d="M20 18h2"></path><path d="m19.07 10.93-1.41 1.41"></path><path d="M22 22H2"></path><path d="m8 22 4-10 4 10"></path></svg>
+                        Landing Animation Behavior
+                    </h3>
+                    <div class="feature-details">
+                        <p>The landing animation was modified to always display for non-logged-in users, removing the localStorage check that previously limited it to first-time visitors only.</p>
+                        
+                        <div class="implementation-notes">
+                            <h4>Implementation Notes for Backend:</h4>
+                            <p>No backend changes required. This is a purely frontend change that modifies when the animation is displayed based on authentication state.</p>
+                        </div>
+
+                        <h4>Code Changes:</h4>
+                        <div class="code-block">
+                            <pre>// app/page.tsx
+// Before:
+useEffect(() => {
+  const hasVisitedBefore = localStorage.getItem('hasVisitedBefore');
+  if (!hasVisitedBefore) {
+    setShowAnimation(true);
+    localStorage.setItem('hasVisitedBefore', 'true');
+  } else {
+    router.push('/explore');
+  }
+}, [router]);
+
+// After:
+useEffect(() => {
+  if (loading) return;
+  
+  if (user) {
+    // If user is logged in, redirect to explore page
+    router.push('/explore');
+  } else {
+    // Always show animation for non-logged-in users
+    setShowAnimation(true);
+  }
+}, [user, loading, router]);</pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>2. Open-Invite Feature</h2>
+                <div class="feature-card">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        Automatic Volunteer Approval
+                    </h3>
+                    <div class="feature-details">
+                        <p>Added an "Open-Invite" toggle feature to initiative creation and editing forms, allowing organizations to automatically accept volunteers without manual approval.</p>
+                        
+                        <div class="tags">
+                            <span class="tag">New Field</span>
+                            <span class="tag">Form Enhancement</span>
+                            <span class="tag">User Experience</span>
+                        </div>
+
+                        <div class="implementation-notes">
+                            <h4>Implementation Notes for Backend:</h4>
+                            <ul>
+                                <li>Add <code>isOpenInvite</code> boolean field to the Initiative schema/table</li>
+                                <li>Modify the volunteer signup endpoint to check this flag and auto-approve volunteers if enabled</li>
+                                <li>Update initiative creation and update APIs to accept and store this new field</li>
+                            </ul>
+                        </div>
+
+                        <h4>Code Changes - Initiative Interface:</h4>
+                        <div class="code-block">
+                            <pre>// Initiative Interface Update
+interface Initiative {
+  _id: string;
+  title: string;
+  organization: string;
+  description: string;
+  img: string;
+  orgIntrests: string[];
+  address: string;
+  timeCommitment: string;
+  volunteersNeeded: number;
+  currentVolunteers: number;
+  startDate: string;
+  endDate: string;
+  userId: string;
+  status: string;
+  isOpenInvite: boolean; // New field
+}</pre>
+                        </div>
+
+                        <h4>Code Changes - Add Initiative Form:</h4>
+                        <div class="code-block">
+                            <pre>// app/components/AddInitiativeForm.tsx
+import { UserCheck } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+
+// Add state variable
+const [isOpenInvite, setIsOpenInvite] = useState(false);
+
+// Add to form JSX
+&lt;div className="space-y-2"&gt;
+  &lt;div className="flex items-center justify-between"&gt;
+    &lt;div className="flex items-center space-x-2"&gt;
+      &lt;UserCheck className="h-4 w-4 text-vollie-green" /&gt;
+      &lt;Label htmlFor="open-invite"&gt;Open Invite&lt;/Label&gt;
+    &lt;/div&gt;
+    &lt;Switch
+      id="open-invite"
+      checked={isOpenInvite}
+      onCheckedChange={setIsOpenInvite}
+    /&gt;
+  &lt;/div&gt;
+  &lt;p className="text-sm text-muted-foreground"&gt;
+    When enabled, volunteers will be automatically accepted without requiring manual approval.
+  &lt;/p&gt;
+&lt;/div&gt;</pre>
+                        </div>
+
+                        <h4>Code Changes - Edit Initiative Form:</h4>
+                        <div class="code-block">
+                            <pre>// app/opportunity-management/page.tsx
+// Add to edit form
+&lt;div className="space-y-2 mt-4"&gt;
+  &lt;div className="flex items-center justify-between"&gt;
+    &lt;div className="flex items-center space-x-2"&gt;
+      &lt;UserCheck className="h-4 w-4 text-vollie-green" /&gt;
+      &lt;Label htmlFor="edit-open-invite"&gt;Open Invite&lt;/Label&gt;
+    &lt;/div&gt;
+    &lt;Switch
+      id="edit-open-invite"
+      checked={editData.isOpenInvite || false}
+      onCheckedChange={(checked) =&gt;
+        setEditData({ ...editData, isOpenInvite: checked })
+      }
+    /&gt;
+  &lt;/div&gt;
+  &lt;p className="text-sm text-muted-foreground"&gt;
+    When enabled, volunteers will be automatically accepted without requiring manual approval.
+  &lt;/p&gt;
+&lt;/div&gt;</pre>
+                        </div>
+
+                        <h4>Visual Indicator for Open-Invite Initiatives:</h4>
+                        <div class="code-block">
+                            <pre>// In initiative list item
+{initiative.isOpenInvite && (
+  &lt;Badge variant="outline" className="bg-green-50 text-green-700 border-green-200"&gt;
+    &lt;UserCheck className="h-3 w-3 mr-1" /&gt;
+    Open Invite
+  &lt;/Badge&gt;
+)}</pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>3. UI Enhancements</h2>
+                
+                <div class="feature-card">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                        Modernized Navbar Design
+                    </h3>
+                    <div class="feature-details">
+                        <p>The Navbar was redesigned for a cleaner, more modern look by removing the text logo next to the icon and improving spacing and alignment.</p>
+                        
+                        <div class="implementation-notes">
+                            <h4>Implementation Notes for Backend:</h4>
+                            <p>No backend changes required. This is a purely frontend styling change.</p>
+                        </div>
+
+                        <h4>Code Changes:</h4>
+                        <div class="code-block">
+                            <pre>// app/components/Navbar.tsx
+// Before:
+&lt;Link href="/explore" className="flex items-center space-x-2"&gt;
+  &lt;Image
+    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Copy_of_Volunteen_Logo-removebg-preview-RiE6TyzfOc1innz0Iud7ZxghahIAY0.png"
+    alt="Vollie Logo"
+    width={40}
+    height={40}
+    className="w-auto h-8"
+  /&gt;
+  &lt;span className="text-2xl font-bold text-vollie-blue"&gt;Vollie&lt;/span&gt;
+&lt;/Link&gt;
+
+// After:
+&lt;div className="flex items-center"&gt;
+  &lt;Link href="/explore" className="flex items-center"&gt;
+    &lt;Image
+      src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Copy_of_Volunteen_Logo-removebg-preview-RiE6TyzfOc1innz0Iud7ZxghahIAY0.png"
+      alt="Vollie Logo"
+      width={40}
+      height={40}
+      className="w-auto h-10"
+    /&gt;
+  &lt;/Link&gt;
+  &lt;div className="hidden md:flex ml-6 space-x-1"&gt;</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        Improved Explore Page
+                    </h3>
+                    <div class="feature-details">
+                        <p>Enhanced the Explore page with a cleaner search bar design, better spacing, and improved visual hierarchy.</p>
+                        
+                        <div class="implementation-notes">
+                            <h4>Implementation Notes for Backend:</h4>
+                            <p>No backend changes required. These are purely frontend styling changes.</p>
+                        </div>
+
+                        <h4>Key UI Changes:</h4>
+                        <ul>
+                            <li>Rounded search bar with subtle border styling</li>
+                            <li>Added helpful hint text below the search bar</li>
+                            <li>Improved spacing and alignment of filter components</li>
+                            <li>Enhanced opportunity cards with consistent styling</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>4. Achievements Page Fix</h2>
+                <div class="feature-card">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.21 13.89 7 23l5-3 5 3-1.21-9.12"></path><circle cx="12" cy="8" r="7"></circle></svg>
+                        Loading State and Error Handling
+                    </h3>
+                    <div class="feature-details">
+                        <p>Fixed issues with the Achievements page by improving loading state handling and adding proper error handling for cases when user data isn't fully initialized.</p>
+                        
+                        <div class="implementation-notes">
+                            <h4>Implementation Notes for Backend:</h4>
+                            <ul>
+                                <li>Ensure the user stats and achievements are properly initialized when creating new users</li>
+                                <li>Consider adding an API endpoint to initialize missing user stats if they don't exist</li>
+                            </ul>
+                        </div>
+
+                        <h4>Code Changes:</h4>
+                        <div class="code-block">
+                            <pre>// app/achievements/page.tsx
+// Added loading state check
+if (loading) {
+  return (
+    &lt;div className="container mx-auto py-8 pt-20"&gt;
+      &lt;div className="flex flex-col items-center justify-center py-12"&gt;
+        &lt;div className="animate-spin rounded-full h-12 w-12 border-b-2 border-vollie-blue mb-4"&gt;&lt;/div&gt;
+        &lt;p className="text-muted-foreground"&gt;Loading achievements...&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  )
+}
+
+// Added error state for when user is not logged in
+if (!user) {
+  return (
+    &lt;div className="container mx-auto py-8 pt-20"&gt;
+      &lt;div className="flex flex-col items-center justify-center py-12"&gt;
+        &lt;div className="p-4 rounded-full bg-red-100 mb-4"&gt;
+          &lt;Trophy className="h-12 w-12 text-vollie-blue" /&gt;
+        &lt;/div&gt;
+        &lt;h2 className="text-xl font-semibold mb-2"&gt;Unable to load achievements&lt;/h2&gt;
+        &lt;p className="text-muted-foreground mb-4"&gt;Please try logging in again&lt;/p&gt;
+        &lt;Button asChild&gt;
+          &lt;Link href="/login"&gt;Log In&lt;/Link&gt;
+        &lt;/Button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  )
+}
+
+// Added fallback for when user stats or achievements are not initialized
+if (!user.stats || !user.stats.achievements) {
+  // Create default achievements based on user type
+  const achievements = user.userType === 2 ? volunteerAchievements : organizationAchievements;
+  
+  return (
+    &lt;div className="container mx-auto py-8 pt-20"&gt;
+      &lt;Card className="max-w-4xl mx-auto"&gt;
+        &lt;CardHeader&gt;
+          &lt;CardTitle&gt;Achievements&lt;/CardTitle&gt;
+          &lt;CardDescription&gt;Track your progress and unlock rewards&lt;/CardDescription&gt;
+        &lt;/CardHeader&gt;
+        &lt;CardContent className="space-y-4"&gt;
+          &lt;div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"&gt;
+            {achievements.map((achievement) =&gt; (
+              &lt;div 
+                key={achievement.id}
+                className="border rounded-lg p-4 bg-muted/20"
+              &gt;
+                &lt;h3 className="font-semibold"&gt;{achievement.name}&lt;/h3&gt;
+                &lt;p className="text-sm text-muted-foreground"&gt;{achievement.description}&lt;/p&gt;
+                &lt;div className="mt-2"&gt;
+                  &lt;Progress value={0} className="h-2" /&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+            ))}
+          &lt;/div&gt;
+        &lt;/CardContent&gt;
+      &lt;/Card&gt;
+    &lt;/div&gt;
+  )
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>5. Backend Integration Requirements</h2>
+                
+                <div class="feature-card">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v19"></path><path d="M5 8h14"></path><path d="M5 16h14"></path></svg>
+                        Schema Updates
+                    </h3>
+                    <div class="feature-details">
+                        <h4>Initiative Schema</h4>
+                        <p>Add the following field to the Initiative schema:</p>
+                        <ul>
+                            <li><strong>isOpenInvite</strong>: Boolean - Indicates whether volunteers are automatically accepted</li>
+                        </ul>
+
+                        <h4>User Schema</h4>
+                        <p>Ensure the User schema has proper initialization for:</p>
+                        <ul>
+                            <li><strong>stats</strong>: Object containing user statistics</li>
+                            <li><strong>stats.achievements</strong>: Array of achievement objects</li>
+                            <li><strong>stats.dailyStreak</strong>: Number tracking consecutive days of activity</li>
+                            <li><strong>stats.lastVolunteerDate</strong>: String or null - Date of last volunteer activity</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h13l4-3.5L18 6Z"></path><path d="M12 13v8"></path><path d="M12 3v3"></path></svg>
+                        API Endpoint Updates
+                    </h3>
+                    <div class="feature-details">
+                        <h4>Initiative Endpoints</h4>
+                        <ul>
+                            <li>Update <strong>Create Initiative</strong> endpoint to accept and store the <code>isOpenInvite</code> field</li>
+                            <li>Update <strong>Edit Initiative</strong> endpoint to accept and update the <code>isOpenInvite</code> field</li>
+                            <li>Modify <strong>Initiative List</strong> endpoint to include the <code>isOpenInvite</code> field in responses</li>
+                        </ul>
+
+                        <h4>Volunteer Signup Process</h4>
+                        <ul>
+                            <li>Modify the volunteer signup logic to check the <code>isOpenInvite</code> flag</li>
+                            <li>If <code>isOpenInvite</code> is true, automatically approve the volunteer without requiring organization approval</li>
+                            <li>Send appropriate notifications based on whether the signup was auto-approved or requires manual approval</li>
+                        </ul>
+
+                        <h4>User Data Initialization</h4>
+                        <ul>
+                            <li>Ensure new users have properly initialized stats and achievements objects</li>
+                            <li>Consider adding an endpoint to initialize missing user data if it doesn't exist</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p class="muted">This document was generated to help with the implementation of frontend changes to the backend of the Vollie platform.</p>
+        </footer>
+    </div>
+</body>
+</html> 

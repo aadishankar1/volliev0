@@ -1,335 +1,203 @@
 "use client"
 
+import { useState } from "react"
 import { useAuth } from "../context/AuthContext"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Star, Trophy, Award, Target, Flame, Lock } from "lucide-react"
+import { Star, Trophy, Award, Target, Flame, Lock, Eye, Plus } from "lucide-react"
 import { motion } from "framer-motion"
+import { Button } from "@/components/ui/button"
+import { AchievementUnlockAnimation } from "../components/AchievementUnlockAnimation"
+import Link from "next/link"
 
 const volunteerAchievements = [
   {
-    id: "1",
+    id: "v1",
     name: "First Steps",
-    description: "Complete your first volunteer initiative",
+    description: "Sign-up for your first initiative",
     xp: 100,
     unlocked: false,
     level: "common",
   },
   {
-    id: "2",
+    id: "v2",
+    name: "Impact Initiate",
+    description: "Complete your first initiative",
+    xp: 200,
+    unlocked: false,
+    level: "common",
+  },
+  {
+    id: "v3",
     name: "Helping Hand",
-    description: "Volunteer for 10 hours",
-    xp: 250,
-    unlocked: false,
-    level: "common",
-  },
-  {
-    id: "3",
-    name: "Community Pillar",
-    description: "Help 5 different organizations",
+    description: "Complete five initiatives",
     xp: 500,
     unlocked: false,
     level: "rare",
   },
   {
-    id: "4",
-    name: "Dedication",
-    description: "Complete 10 volunteer initiatives",
-    xp: 750,
-    unlocked: false,
-    level: "rare",
-  },
-  {
-    id: "5",
-    name: "Time Well Spent",
-    description: "Volunteer for 100 hours",
-    xp: 1500,
-    unlocked: false,
-    level: "epic",
-  },
-  {
-    id: "6",
-    name: "Jack of All Trades",
-    description: "Volunteer in 5 different interest areas",
+    id: "v4",
+    name: "Versatile Volunteer",
+    description: "Join volunteering initiatives in five different impact areas",
     xp: 500,
     unlocked: false,
     level: "rare",
   },
   {
-    id: "7",
-    name: "Team Player",
-    description: "Join 3 different volunteer teams",
-    xp: 300,
-    unlocked: false,
-    level: "common",
-  },
-  {
-    id: "8",
-    name: "Social Butterfly",
-    description: "Make 10 friends on the platform",
-    xp: 250,
-    unlocked: false,
-    level: "common",
-  },
-  {
-    id: "9",
-    name: "Streak Master",
-    description: "Maintain a 30-day login streak",
-    xp: 1000,
-    unlocked: false,
-    level: "epic",
-  },
-  {
-    id: "10",
-    name: "Local Hero",
-    description: "Complete 20 initiatives within your local community",
+    id: "v5",
+    name: "Century Contributor",
+    description: "Complete one-hundred hours of volunteer work",
     xp: 2000,
-    unlocked: false,
-    level: "legendary",
-  },
-  {
-    id: "11",
-    name: "Environmental Champion",
-    description: "Complete 10 environmental initiatives",
-    xp: 1000,
-    unlocked: false,
-    level: "epic",
-  },
-  {
-    id: "12",
-    name: "Education Advocate",
-    description: "Volunteer 50 hours in educational initiatives",
-    xp: 1500,
-    unlocked: false,
-    level: "epic",
-  },
-  {
-    id: "13",
-    name: "Healthcare Helper",
-    description: "Complete 15 health-related volunteer activities",
-    xp: 1500,
-    unlocked: false,
-    level: "epic",
-  },
-  {
-    id: "14",
-    name: "Weekend Warrior",
-    description: "Complete 20 weekend volunteer activities",
-    xp: 1000,
-    unlocked: false,
-    level: "epic",
-  },
-  {
-    id: "15",
-    name: "Volunteer Veteran",
-    description: "Accumulate 500 hours of volunteer work",
-    xp: 3000,
     unlocked: false,
     level: "mythic",
   },
   {
-    id: "16",
-    name: "Community Legend",
-    description: "Help 50 different organizations",
-    xp: 3000,
-    unlocked: false,
-    level: "mythic",
-  },
-  {
-    id: "17",
-    name: "Perfect Attendance",
-    description: "Never miss a scheduled volunteer activity",
-    xp: 2000,
+    id: "v6",
+    name: "Half-Century Hero",
+    description: "Complete fifty hours of volunteer work",
+    xp: 1000,
     unlocked: false,
     level: "legendary",
   },
   {
-    id: "18",
-    name: "Skill Sharer",
-    description: "Mentor 5 new volunteers",
-    xp: 1500,
+    id: "v7",
+    name: "Time Donor",
+    description: "Complete ten hours of volunteer work",
+    xp: 500,
     unlocked: false,
-    level: "epic",
+    level: "rare",
   },
   {
-    id: "19",
-    name: "Crisis Responder",
-    description: "Participate in 5 emergency response initiatives",
-    xp: 2000,
+    id: "v8",
+    name: "Dedicated Doer",
+    description: "Complete ten initiatives",
+    xp: 1000,
     unlocked: false,
     level: "legendary",
   },
   {
-    id: "20",
-    name: "Volunteer Elite",
-    description: "Complete all other volunteer achievements",
-    xp: 5000,
+    id: "v9",
+    name: "Volunteer Virtuoso",
+    description: "Complete fifty initiatives",
+    xp: 2000,
     unlocked: false,
     level: "mythic",
+  },
+  {
+    id: "v10",
+    name: "Community Connector",
+    description: "Invite a friend to volunteer on an initiative with you",
+    xp: 500,
+    unlocked: false,
+    level: "rare",
+  },
+  {
+    id: "v11",
+    name: "Network Nurturer",
+    description: "Invite three friends to volunteer on initiatives with you",
+    xp: 1000,
+    unlocked: false,
+    level: "legendary",
+  },
+  {
+    id: "v12",
+    name: "Weekly Warrior",
+    description: "Maintain a one-week streak on Vollie",
+    xp: 1000,
+    unlocked: false,
+    level: "legendary",
+  },
+  {
+    id: "v13",
+    name: "Monthly Maven",
+    description: "Maintain a one-month streak on Vollie",
+    xp: 1000,
+    unlocked: false,
+    level: "legendary",
   },
 ]
 
 const organizationAchievements = [
   {
-    id: "1",
-    name: "First Initiative",
-    description: "Create your first volunteer initiative",
+    id: "o1",
+    name: "Initiative Innovator",
+    description: "Post your first initiative",
     xp: 100,
     unlocked: false,
     level: "common",
   },
   {
-    id: "2",
-    name: "Volunteer Magnet",
-    description: "Attract 50 volunteers to your initiatives",
-    xp: 500,
-    unlocked: false,
-    level: "rare",
-  },
-  {
-    id: "3",
-    name: "Community Builder",
-    description: "Successfully complete 5 initiatives",
-    xp: 250,
+    id: "o2",
+    name: "Mission Accomplished",
+    description: "Complete your first initiative",
+    xp: 200,
     unlocked: false,
     level: "common",
   },
   {
-    id: "4",
-    name: "Impact Maker",
-    description: "Accumulate 1000 volunteer hours across all initiatives",
-    xp: 1500,
-    unlocked: false,
-    level: "epic",
-  },
-  {
-    id: "5",
-    name: "Diversity Champion",
-    description: "Create initiatives in 5 different interest areas",
-    xp: 750,
-    unlocked: false,
-    level: "rare",
-  },
-  {
-    id: "6",
-    name: "Engagement Expert",
-    description: "Have 100 unique volunteers participate in your initiatives",
-    xp: 1000,
-    unlocked: false,
-    level: "epic",
-  },
-  {
-    id: "7",
-    name: "Initiative Maestro",
-    description: "Create 20 volunteer initiatives",
-    xp: 2000,
-    unlocked: false,
-    level: "legendary",
-  },
-  {
-    id: "8",
-    name: "Full House",
-    description: "Have 5 initiatives reach maximum volunteer capacity",
+    id: "o3",
+    name: "Impact Multiplier",
+    description: "Complete five initiatives",
     xp: 500,
     unlocked: false,
     level: "rare",
   },
   {
-    id: "9",
-    name: "Quick Response",
-    description: "Respond to all volunteer applications within 24 hours for a month",
+    id: "o4",
+    name: "Volunteer Magnet",
+    description: "Recruit fifty volunteers to your initiatives",
     xp: 1000,
     unlocked: false,
-    level: "epic",
-  },
-  {
-    id: "10",
-    name: "Event Planning Pro",
-    description: "Successfully organize 10 multi-day initiatives",
-    xp: 1500,
-    unlocked: false,
-    level: "epic",
-  },
-  {
-    id: "11",
-    name: "Local Impact",
-    description: "Engage 500 local volunteers in your initiatives",
-    xp: 2000,
-    unlocked: false,
     level: "legendary",
   },
   {
-    id: "12",
-    name: "Feedback Champion",
-    description: "Maintain a 4.5+ star rating across 50 reviews",
-    xp: 1500,
+    id: "o5",
+    name: "Full House",
+    description: "Have five initiatives reach maximum volunteer capacity",
+    xp: 500,
     unlocked: false,
-    level: "epic",
+    level: "rare",
   },
   {
-    id: "13",
-    name: "Team Builder",
-    description: "Create 5 successful volunteer teams",
+    id: "o6",
+    name: "Change Champion",
+    description: "Complete ten initiatives",
     xp: 1000,
     unlocked: false,
-    level: "epic",
+    level: "legendary",
   },
   {
-    id: "14",
-    name: "Skill Developer",
-    description: "Provide training to 100 volunteers",
-    xp: 1500,
-    unlocked: false,
-    level: "epic",
-  },
-  {
-    id: "15",
-    name: "Community Legend",
-    description: "Complete 100 successful initiatives",
-    xp: 3000,
-    unlocked: false,
-    level: "mythic",
-  },
-  {
-    id: "16",
-    name: "Hour Millionaire",
-    description: "Accumulate 10,000 volunteer hours across all initiatives",
-    xp: 3000,
-    unlocked: false,
-    level: "mythic",
-  },
-  {
-    id: "17",
-    name: "Perfect Organizer",
-    description: "Complete 20 initiatives with 100% volunteer satisfaction",
+    id: "o7",
+    name: "Impact Titan",
+    description: "Complete fifty initiatives",
     xp: 2000,
+    unlocked: false,
+    level: "mythic",
+  },
+  {
+    id: "o8",
+    name: "Community Catalyst",
+    description: "Recruit one-hundred volunteers to your initiatives",
+    xp: 1000,
     unlocked: false,
     level: "legendary",
   },
   {
-    id: "18",
-    name: "Crisis Management",
-    description: "Successfully organize 10 emergency response initiatives",
-    xp: 2000,
+    id: "o9",
+    name: "Weekly Changemaker",
+    description: "Maintain a one-week streak on Vollie",
+    xp: 1000,
     unlocked: false,
     level: "legendary",
   },
   {
-    id: "19",
-    name: "Volunteer Network",
-    description: "Build a network of 1000 active volunteers",
-    xp: 3000,
+    id: "o10",
+    name: "Monthly Mobilizer",
+    description: "Maintain a one-month streak on Vollie",
+    xp: 1000,
     unlocked: false,
-    level: "mythic",
-  },
-  {
-    id: "20",
-    name: "Organization Elite",
-    description: "Complete all other organization achievements",
-    xp: 5000,
-    unlocked: false,
-    level: "mythic",
+    level: "legendary",
   },
 ]
 
@@ -367,13 +235,116 @@ const getAchievementIcon = (level: string) => {
   }
 }
 
-export default function AchievementsPage() {
-  const { user } = useAuth()
+// Helper function to calculate achievement progress
+const calculateProgress = (achievement: any, userStats: any) => {
+  if (achievement.unlocked) return 100;
+  if (achievement.progress !== undefined && achievement.total !== undefined) {
+    return Math.min(100, (achievement.progress / achievement.total) * 100);
+  }
+  
+  // Default progress calculations based on achievement ID
+  if (userStats) {
+    const { 
+      initiativesCompleted = 0, 
+      hoursVolunteered = 0, 
+      impactAreas = 0, 
+      friendsInvited = 0,
+      dailyStreak = 0,
+      volunteersEngaged = 0,
+      fullCapacityInitiatives = 0
+    } = userStats;
+    
+    // Volunteer achievements
+    if (achievement.id === "v3") return Math.min(100, (initiativesCompleted / 5) * 100);
+    if (achievement.id === "v4") return Math.min(100, (impactAreas / 5) * 100);
+    if (achievement.id === "v5") return Math.min(100, (hoursVolunteered / 100) * 100);
+    if (achievement.id === "v6") return Math.min(100, (hoursVolunteered / 50) * 100);
+    if (achievement.id === "v7") return Math.min(100, (hoursVolunteered / 10) * 100);
+    if (achievement.id === "v8") return Math.min(100, (initiativesCompleted / 10) * 100);
+    if (achievement.id === "v9") return Math.min(100, (initiativesCompleted / 50) * 100);
+    if (achievement.id === "v11") return Math.min(100, (friendsInvited / 3) * 100);
+    if (achievement.id === "v12") return Math.min(100, (dailyStreak / 7) * 100);
+    if (achievement.id === "v13") return Math.min(100, (dailyStreak / 30) * 100);
+    
+    // Organization achievements
+    if (achievement.id === "o3") return Math.min(100, (initiativesCompleted / 5) * 100);
+    if (achievement.id === "o4") return Math.min(100, (volunteersEngaged / 50) * 100);
+    if (achievement.id === "o5") return Math.min(100, (fullCapacityInitiatives / 5) * 100);
+    if (achievement.id === "o6") return Math.min(100, (initiativesCompleted / 10) * 100);
+    if (achievement.id === "o7") return Math.min(100, (initiativesCompleted / 50) * 100);
+    if (achievement.id === "o8") return Math.min(100, (volunteersEngaged / 100) * 100);
+    if (achievement.id === "o9") return Math.min(100, (dailyStreak / 7) * 100);
+    if (achievement.id === "o10") return Math.min(100, (dailyStreak / 30) * 100);
+  }
+  
+  return 0;
+}
 
+export default function AchievementsPage() {
+  const { user, trackAchievementProgress, loading } = useAuth()
+  const [testAchievement, setTestAchievement] = useState<any>(null)
+  const [showTestControls, setShowTestControls] = useState(false)
+  const [simulatedProgress, setSimulatedProgress] = useState<Record<string, number>>({})
+
+  // Show loading state while user data is being fetched
+  if (loading) {
+    return (
+      <div className="container mx-auto py-8 pt-20">
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-vollie-blue mb-4"></div>
+          <p className="text-muted-foreground">Loading achievements...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // If user is not logged in or there's an error
   if (!user) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-vollie-blue"></div>
+      <div className="container mx-auto py-8 pt-20">
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="p-4 rounded-full bg-red-100 mb-4">
+            <Trophy className="h-12 w-12 text-vollie-blue" />
+          </div>
+          <h2 className="text-xl font-semibold mb-2">Unable to load achievements</h2>
+          <p className="text-muted-foreground mb-4">Please try logging in again</p>
+          <Button asChild>
+            <Link href="/login">Log In</Link>
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  // Ensure user has stats and achievements initialized
+  if (!user.stats || !user.stats.achievements) {
+    // Create default achievements based on user type
+    const achievements = user.userType === 2 ? volunteerAchievements : organizationAchievements;
+    
+    return (
+      <div className="container mx-auto py-8 pt-20">
+        <Card className="max-w-4xl mx-auto">
+          <CardHeader>
+            <CardTitle>Achievements</CardTitle>
+            <CardDescription>Track your progress and unlock rewards</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {achievements.map((achievement) => (
+                <div 
+                  key={achievement.id}
+                  className="border rounded-lg p-4 bg-muted/20"
+                >
+                  <h3 className="font-semibold">{achievement.name}</h3>
+                  <p className="text-sm text-muted-foreground">{achievement.description}</p>
+                  <div className="mt-2">
+                    <Progress value={0} className="h-2" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     )
   }
@@ -386,6 +357,56 @@ export default function AchievementsPage() {
   const currentLevelXP = userXP - 100 * (userLevel - 1) ** 2
   const nextLevelXP = 100 * userLevel ** 2 - userXP
   const xpProgress = (currentLevelXP / (nextLevelXP + currentLevelXP)) * 100
+
+  // Function to simulate unlocking an achievement for testing
+  const simulateAchievementUnlock = (achievementType: 'initiative_signup' | 'initiative_complete' | 'volunteer_hours' | 'impact_areas' | 'invite_friend' | 'streak' | 'volunteer_capacity') => {
+    trackAchievementProgress(achievementType);
+  }
+
+  // Function to show test achievement animation
+  const showTestAchievement = (achievement: any) => {
+    setTestAchievement({
+      ...achievement,
+      level: achievement.level || "common"
+    });
+  }
+
+  // Toggle test controls visibility
+  const toggleTestControls = () => {
+    setShowTestControls(!showTestControls);
+  }
+
+  // Function to simulate progress for an achievement
+  const simulateProgress = (achievementId: string, increment: number = 20) => {
+    setSimulatedProgress(prev => {
+      const currentProgress = prev[achievementId] || 0;
+      const newProgress = Math.min(100, currentProgress + increment);
+      
+      // If we reach 100%, show the unlock animation
+      if (newProgress >= 100) {
+        const achievement = achievements.find(a => a.id === achievementId);
+        if (achievement) {
+          showTestAchievement(achievement);
+        }
+      }
+      
+      return {
+        ...prev,
+        [achievementId]: newProgress
+      };
+    });
+  }
+
+  // Enhanced progress calculation that takes into account simulated progress
+  const getAchievementProgress = (achievement: any) => {
+    // If we have simulated progress for this achievement, use that
+    if (simulatedProgress[achievement.id] !== undefined) {
+      return simulatedProgress[achievement.id];
+    }
+    
+    // Otherwise use the real progress
+    return calculateProgress(achievement, user.stats);
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 pt-20">
@@ -467,6 +488,63 @@ export default function AchievementsPage() {
           </Card>
         </div>
 
+        {/* Test Controls Toggle */}
+        <div className="flex justify-end">
+          <Button 
+            variant="outline" 
+            onClick={toggleTestControls}
+            className="text-vollie-blue border-vollie-blue hover:bg-vollie-blue/10"
+          >
+            {showTestControls ? "Hide Test Controls" : "Show Test Controls"}
+          </Button>
+        </div>
+
+        {/* Test Controls (for development) */}
+        {showTestControls && (
+          <Card className="border-vollie-light-blue shadow-md hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle className="text-vollie-blue">Test Achievement Animations</CardTitle>
+              <CardDescription>
+                Use these buttons to test achievement unlocks and animations
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => simulateAchievementUnlock('initiative_signup')}
+                >
+                  Simulate Initiative Signup
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => simulateAchievementUnlock('initiative_complete')}
+                >
+                  Simulate Initiative Complete
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => simulateAchievementUnlock('volunteer_hours')}
+                >
+                  Simulate Volunteer Hours
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => showTestAchievement({
+                    id: "test1",
+                    name: "Test Achievement",
+                    description: "This is a test achievement with a cool animation!",
+                    xp: 500,
+                    level: "legendary"
+                  })}
+                >
+                  Show Test Animation
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Achievements Section */}
         <Card className="border-vollie-light-blue shadow-md hover:shadow-lg transition-shadow">
           <CardHeader>
@@ -503,54 +581,122 @@ export default function AchievementsPage() {
 
               {/* Achievements Grid */}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {achievements.map((achievement) => (
-                  <div
-                    key={achievement.id}
-                    className={`group relative overflow-hidden rounded-lg border transition-all ${
-                      achievement.unlocked
-                        ? "border-vollie-light-blue bg-white dark:bg-gray-800"
-                        : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900"
-                    }`}
-                  >
-                    <div className="p-4">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-vollie-blue dark:text-vollie-light-blue flex items-center gap-2">
-                            {getAchievementIcon(achievement.level)}
-                            {achievement.name}
-                          </h3>
-                          <p className="mt-1 text-sm text-muted-foreground">
-                            {achievement.description}
-                          </p>
+                {achievements.map((achievement) => {
+                  // Calculate progress for this achievement
+                  const progress = getAchievementProgress(achievement);
+                  
+                  return (
+                    <motion.div
+                      key={achievement.id}
+                      whileHover={{ scale: 1.02 }}
+                      className={`group relative overflow-hidden rounded-lg border transition-all ${
+                        achievement.unlocked || progress >= 100
+                          ? "border-vollie-light-blue bg-white dark:bg-gray-800"
+                          : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                      }`}
+                    >
+                      <div className="p-4">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-vollie-blue dark:text-vollie-light-blue flex items-center gap-2">
+                              {getAchievementIcon(achievement.level)}
+                              {achievement.name}
+                            </h3>
+                            <p className="mt-1 text-sm text-muted-foreground">
+                              {achievement.description}
+                            </p>
+                          </div>
+                          
+                          {/* Action buttons */}
+                          <div className="flex gap-1">
+                            {/* Preview button */}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 rounded-full"
+                              onClick={() => showTestAchievement(achievement)}
+                              title="Preview animation"
+                            >
+                              <motion.div
+                                whileHover={{ rotate: 15 }}
+                                transition={{ type: "spring", stiffness: 300 }}
+                              >
+                                <Eye className="h-4 w-4 text-muted-foreground" />
+                              </motion.div>
+                            </Button>
+                            
+                            {/* Progress button (only for non-unlocked achievements) */}
+                            {!achievement.unlocked && progress < 100 && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 rounded-full"
+                                onClick={() => simulateProgress(achievement.id)}
+                                title="Simulate progress"
+                              >
+                                <motion.div
+                                  whileHover={{ rotate: 90 }}
+                                  transition={{ type: "spring", stiffness: 300 }}
+                                >
+                                  <Plus className="h-4 w-4 text-muted-foreground" />
+                                </motion.div>
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                        
+                        {/* Progress bar */}
+                        <div className="mt-4">
+                          <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                            <span>{achievement.unlocked || progress >= 100 ? 'Completed' : `${Math.round(progress)}%`}</span>
+                            {!achievement.unlocked && progress < 100 && (
+                              <span className="text-vollie-blue font-medium">
+                                {achievement.xp} XP
+                              </span>
+                            )}
+                          </div>
+                          <Progress 
+                            value={progress} 
+                            className={`h-2 ${
+                              achievement.unlocked || progress >= 100
+                                ? "[&>div]:bg-green-500 bg-green-100 dark:bg-green-900/20" 
+                                : `[&>div]:${getLevelColor(achievement.level).replace('bg-', '[&>div]:bg-')} bg-gray-100 dark:bg-gray-700`
+                            }`}
+                          />
+                        </div>
+                        
+                        <div className="mt-4 flex items-center justify-between">
+                          <Badge
+                            variant="secondary"
+                            className={`${getLevelColor(achievement.level)} text-white dark:text-gray-100`}
+                          >
+                            {achievement.level.charAt(0).toUpperCase() + achievement.level.slice(1)}
+                          </Badge>
+                          {(achievement.unlocked || progress >= 100) && (
+                            <span className="text-sm font-medium text-green-500 dark:text-green-400 flex items-center gap-1">
+                              <Trophy className="h-4 w-4" />
+                              Unlocked
+                            </span>
+                          )}
                         </div>
                       </div>
-                      <div className="mt-4 flex items-center justify-between">
-                        <Badge
-                          variant="secondary"
-                          className={`${getLevelColor(achievement.level)} text-white dark:text-gray-100`}
-                        >
-                          {achievement.level.charAt(0).toUpperCase() + achievement.level.slice(1)}
-                        </Badge>
-                        <span className="text-sm font-medium text-vollie-blue dark:text-vollie-light-blue">
-                          {achievement.xp} XP
-                        </span>
-                      </div>
-                      {achievement.unlocked && (
-                        <div className="absolute inset-0 bg-vollie-blue/5 dark:bg-vollie-light-blue/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      )}
-                      {!achievement.unlocked && (
-                        <div className="absolute inset-0 bg-gray-900/60 dark:bg-gray-950/60 flex items-center justify-center">
-                          <Lock className="h-6 w-6 text-white dark:text-gray-200" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                    </motion.div>
+                  );
+                })}
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
+      
+      {/* Achievement unlock animation */}
+      {testAchievement && (
+        <AchievementUnlockAnimation
+          achievement={testAchievement}
+          isVisible={true}
+          onClose={() => setTestAchievement(null)}
+        />
+      )}
     </div>
   )
 }
