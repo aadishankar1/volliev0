@@ -7,6 +7,7 @@ import { getUser, userLogin, userSignup } from "@/services/apiAction/user";
 import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import { AnimatedNotification } from "../components/AnimatedNotification";
+import { AchievementUnlockAnimation } from "../components/AchievementUnlockAnimation";
 import { cache, CACHE_KEYS } from "../lib/cache";
 import { request } from "@/services/api";
 import { endpoints } from "@/services/endpoints";
@@ -19,6 +20,8 @@ type Achievement = {
   unlocked: boolean;
   unlockedAt?: Date;
   level: "common" | "rare" | "epic" | "legendary" | "mythic";
+  progress?: number;
+  total?: number;
 };
 
 type Challenge = {
@@ -46,6 +49,9 @@ type UserStats = {
   initiativesCreated?: number;
   totalVolunteerHours?: number;
   volunteersEngaged?: number;
+  fullCapacityInitiatives?: number;
+  impactAreas?: number;
+  friendsInvited?: number;
   achievements?: Achievement[];
   dailyStreak: number;
   lastVolunteerDate: string | null;
@@ -143,6 +149,7 @@ type NotificationType = {
   title: string;
   description: string;
   xp?: number;
+  achievement?: Achievement;
 };
 
 type AuthContextType = {
@@ -159,6 +166,12 @@ type AuthContextType = {
   logout: () => void;
   updateProfile: (data: Partial<User>) => Promise<void>;
   loading: boolean;
+  forgotPassword: (email: string) => Promise<void>;
+  resetPassword: (token: string, password: string) => Promise<void>;
+  trackAchievementProgress: (
+    achievementType: 'initiative_signup' | 'initiative_complete' | 'volunteer_hours' | 
+    'impact_areas' | 'invite_friend' | 'streak' | 'volunteer_capacity'
+  ) => void;
   getPersonalizedRecommendations: (
     opportunities: Opportunity[]
   ) => Opportunity[];
@@ -201,135 +214,191 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const defaultVolunteerAchievements: Achievement[] = [
   {
-    id: "1",
+    id: "v1",
     name: "First Steps",
-    description: "Complete your first volunteer initiative",
+    description: "Sign-up for your first initiative",
     xp: 100,
     unlocked: false,
     level: "common",
   },
   {
-    id: "2",
+    id: "v2",
+    name: "Impact Initiate",
+    description: "Complete your first initiative",
+    xp: 200,
+    unlocked: false,
+    level: "common",
+  },
+  {
+    id: "v3",
     name: "Helping Hand",
-    description: "Volunteer for 10 hours",
-    xp: 250,
+    description: "Complete five initiatives",
+    xp: 500,
     unlocked: false,
     level: "rare",
   },
   {
-    id: "3",
-    name: "Community Pillar",
-    description: "Help 5 different organizations",
+    id: "v4",
+    name: "Versatile Volunteer",
+    description: "Join volunteering initiatives in five different impact areas",
     xp: 500,
     unlocked: false,
-    level: "epic",
+    level: "rare",
   },
   {
-    id: "4",
-    name: "Dedication",
-    description: "Complete 10 volunteer initiatives",
-    xp: 1000,
-    unlocked: false,
-    level: "legendary",
-  },
-  {
-    id: "5",
-    name: "Time Well Spent",
-    description: "Volunteer for 100 hours",
+    id: "v5",
+    name: "Century Contributor",
+    description: "Complete one-hundred hours of volunteer work",
     xp: 2000,
     unlocked: false,
     level: "mythic",
   },
   {
-    id: "6",
-    name: "Jack of All Trades",
-    description: "Volunteer in 5 different interest areas",
+    id: "v6",
+    name: "Half-Century Hero",
+    description: "Complete fifty hours of volunteer work",
+    xp: 1000,
+    unlocked: false,
+    level: "legendary",
+  },
+  {
+    id: "v7",
+    name: "Time Donor",
+    description: "Complete ten hours of volunteer work",
     xp: 500,
     unlocked: false,
-    level: "epic",
+    level: "rare",
   },
   {
-    id: "7",
-    name: "Team Player",
-    description: "Join 3 different volunteer teams",
-    xp: 300,
+    id: "v8",
+    name: "Dedicated Doer",
+    description: "Complete ten initiatives",
+    xp: 1000,
+    unlocked: false,
+    level: "legendary",
+  },
+  {
+    id: "v9",
+    name: "Volunteer Virtuoso",
+    description: "Complete fifty initiatives",
+    xp: 2000,
+    unlocked: false,
+    level: "mythic",
+  },
+  {
+    id: "v10",
+    name: "Community Connector",
+    description: "Invite a friend to volunteer on an initiative with you",
+    xp: 500,
     unlocked: false,
     level: "rare",
   },
   {
-    id: "8",
-    name: "Social Butterfly",
-    description: "Make 10 friends on the platform",
-    xp: 250,
+    id: "v11",
+    name: "Network Nurturer",
+    description: "Invite three friends to volunteer on initiatives with you",
+    xp: 1000,
     unlocked: false,
-    level: "rare",
+    level: "legendary",
+  },
+  {
+    id: "v12",
+    name: "Weekly Warrior",
+    description: "Maintain a one-week streak on Vollie",
+    xp: 1000,
+    unlocked: false,
+    level: "legendary",
+  },
+  {
+    id: "v13",
+    name: "Monthly Maven",
+    description: "Maintain a one-month streak on Vollie",
+    xp: 1000,
+    unlocked: false,
+    level: "legendary",
   },
 ];
 
 const defaultOrganizationAchievements: Achievement[] = [
   {
-    id: "1",
-    name: "First Initiative",
-    description: "Create your first volunteer initiative",
+    id: "o1",
+    name: "Initiative Innovator",
+    description: "Post your first initiative",
     xp: 100,
     unlocked: false,
     level: "common",
   },
   {
-    id: "2",
-    name: "Volunteer Magnet",
-    description: "Attract 50 volunteers to your initiatives",
-    xp: 250,
+    id: "o2",
+    name: "Mission Accomplished",
+    description: "Complete your first initiative",
+    xp: 200,
+    unlocked: false,
+    level: "common",
+  },
+  {
+    id: "o3",
+    name: "Impact Multiplier",
+    description: "Complete five initiatives",
+    xp: 500,
     unlocked: false,
     level: "rare",
   },
   {
-    id: "3",
-    name: "Community Builder",
-    description: "Successfully complete 5 initiatives",
-    xp: 500,
-    unlocked: false,
-    level: "epic",
-  },
-  {
-    id: "4",
-    name: "Impact Maker",
-    description: "Accumulate 1000 volunteer hours across all initiatives",
+    id: "o4",
+    name: "Volunteer Magnet",
+    description: "Recruit fifty volunteers to your initiatives",
     xp: 1000,
     unlocked: false,
     level: "legendary",
   },
   {
-    id: "5",
-    name: "Diversity Champion",
-    description: "Create initiatives in 5 different interest areas",
+    id: "o5",
+    name: "Full House",
+    description: "Have five initiatives reach maximum volunteer capacity",
     xp: 500,
     unlocked: false,
-    level: "epic",
+    level: "rare",
   },
   {
-    id: "6",
-    name: "Engagement Expert",
-    description: "Have 100 unique volunteers participate in your initiatives",
-    xp: 750,
+    id: "o6",
+    name: "Change Champion",
+    description: "Complete ten initiatives",
+    xp: 1000,
     unlocked: false,
     level: "legendary",
   },
   {
-    id: "7",
-    name: "Initiative Maestro",
-    description: "Create 20 volunteer initiatives",
-    xp: 1000,
+    id: "o7",
+    name: "Impact Titan",
+    description: "Complete fifty initiatives",
+    xp: 2000,
     unlocked: false,
     level: "mythic",
   },
   {
-    id: "8",
-    name: "Full House",
-    description: "Have an initiative reach its maximum volunteer capacity",
-    xp: 300,
+    id: "o8",
+    name: "Community Catalyst",
+    description: "Recruit one-hundred volunteers to your initiatives",
+    xp: 1000,
     unlocked: false,
-    level: "rare",
+    level: "legendary",
+  },
+  {
+    id: "o9",
+    name: "Weekly Changemaker",
+    description: "Maintain a one-week streak on Vollie",
+    xp: 1000,
+    unlocked: false,
+    level: "legendary",
+  },
+  {
+    id: "o10",
+    name: "Monthly Mobilizer",
+    description: "Maintain a one-month streak on Vollie",
+    xp: 1000,
+    unlocked: false,
+    level: "legendary",
   },
 ];
 
@@ -382,23 +451,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState<NotificationType | null>(null);
+  const [unlockedAchievement, setUnlockedAchievement] = useState<Achievement | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     const accessToken = Cookie.get("accessToken");
-    if (!accessToken || user) {
+    if (!accessToken) {
       setLoading(false);
       return;
     }
+    
     setLoading(true);
     getUser()
       .then((user: any) => {
+        // Initialize user stats and achievements based on user type if they don't exist
+        if (user.res && !user.res.stats) {
+          const achievements = user.res.userType === 1 
+            ? defaultOrganizationAchievements 
+            : defaultVolunteerAchievements;
+            
+          user.res.stats = {
+            dailyStreak: 0,
+            lastVolunteerDate: null as string | null,
+            achievements: achievements,
+            challenges: defaultChallenges,
+            quests: defaultQuests
+          };
+        }
+        
         setUser(user.res);
-        setLoading(false);
       })
       .catch((err) => {
+        console.error("Error fetching user data:", err);
+      })
+      .finally(() => {
         setLoading(false);
-        console.log(err);
       });
   }, []);
 
@@ -406,8 +493,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const login = await userLogin(data);
       if (login.res) Cookie.set("accessToken", login?.res?.token);
-      const user: User = jwtDecode(login.res?.token);
-      setUser(user);
+      const userData: User = jwtDecode(login.res?.token);
+      
+      // Initialize user stats and achievements based on user type if they don't exist
+      if (userData && !userData.stats) {
+        const achievements = userData.userType === 1 
+          ? defaultOrganizationAchievements 
+          : defaultVolunteerAchievements;
+          
+        userData.stats = {
+          dailyStreak: 0,
+          lastVolunteerDate: null,
+          achievements: achievements,
+          challenges: defaultChallenges,
+          quests: defaultQuests
+        };
+      }
+      
+      setUser(userData);
       router.push("/profile");
     } catch (err) {
       throw err;
@@ -500,22 +603,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     return activities;
   };
 
-  const updateUserStats = (userId: string, stats: Partial<UserStats & { xp?: number }>) => {
-    if (user) {
-      const updatedUser = {
-        ...user,
-        xp: stats.xp !== undefined ? stats.xp : user.xp,
-        stats: {
-          ...user.stats,
-          ...stats,
-        },
-      };
-
-      // Update cache
-      cache.set(CACHE_KEYS.USER_STATS(userId), updatedUser.stats);
+  const updateUserStats = async (userId: string, statsUpdate: Partial<UserStats>) => {
+    try {
+      // In a real implementation, this would call your API
+      // const data = await request(`/user/${userId}/stats`, "PATCH", statsUpdate);
       
-      // Update state
-      setUser(updatedUser);
+      // For now, we'll simulate a successful API call
+      console.log(`Updated stats for user ${userId}:`, statsUpdate);
+      
+      // Update the user state with the new stats
+      if (user) {
+        const updatedUser = {
+          ...user,
+          stats: {
+            ...user.stats,
+            ...statsUpdate
+          },
+          xp: statsUpdate.xp !== undefined ? statsUpdate.xp : (user.xp || 0)
+        };
+        
+        setUser(updatedUser);
+      }
+    } catch (error) {
+      console.error("Error updating user stats:", error);
     }
   };
 
@@ -949,10 +1059,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const createUser = async (data: any): Promise<void> => {
     try {
-      const user = await userSignup(data);
-      if (user.res) Cookie.set("accessToken", user?.res?.token);
-      const createdUser: User = jwtDecode(user.res?.token);
-      setUser(createdUser);
+      const userResponse = await userSignup(data);
+      if (userResponse.res) Cookie.set("accessToken", userResponse?.res?.token);
+      const createdUser: User = jwtDecode(userResponse.res?.token);
+      
+      // Initialize user stats and achievements based on user type
+      if (createdUser) {
+        const achievements = createdUser.userType === 1 
+          ? defaultOrganizationAchievements 
+          : defaultVolunteerAchievements;
+          
+        createdUser.stats = {
+          dailyStreak: 0,
+          lastVolunteerDate: null,
+          achievements: achievements,
+          challenges: defaultChallenges,
+          quests: defaultQuests
+        };
+        
+        setUser(createdUser);
+      }
     } catch (err) {
       throw err;
     }
@@ -971,6 +1097,185 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     if (user) {
       const updatedActivities = [activity, ...(user.recentActivity || [])].slice(0, 10);
       updateProfile({ ...user, recentActivity: updatedActivities });
+    }
+  };
+
+  const forgotPassword = async (email: string): Promise<void> => {
+    try {
+      // In a real implementation, this would call your API
+      // await request("/user/forgot-password", "POST", { email });
+      
+      // For now, we'll simulate a successful API call
+      console.log(`Password reset email sent to ${email}`);
+      
+      // Show success notification
+      showNotification({
+        type: "achievement",
+        title: "Email Sent",
+        description: "If an account exists with this email, you will receive password reset instructions."
+      });
+    } catch (error) {
+      console.error("Error sending reset email:", error);
+      throw error;
+    }
+  };
+
+  const resetPassword = async (token: string, password: string): Promise<void> => {
+    try {
+      // In a real implementation, this would call your API
+      // await request("/user/reset-password", "POST", { token, password });
+      
+      // For now, we'll simulate a successful API call
+      console.log(`Password reset for token ${token}`);
+      
+      // Show success notification
+      showNotification({
+        type: "achievement",
+        title: "Password Reset",
+        description: "Your password has been reset successfully."
+      });
+    } catch (error) {
+      console.error("Error resetting password:", error);
+      throw error;
+    }
+  };
+
+  // Track achievement progress and unlock achievements when criteria are met
+  const trackAchievementProgress = (
+    achievementType: 'initiative_signup' | 'initiative_complete' | 'volunteer_hours' | 
+    'impact_areas' | 'invite_friend' | 'streak' | 'volunteer_capacity'
+  ) => {
+    if (!user || !user.stats?.achievements) return;
+    
+    const achievements = [...user.stats.achievements];
+    let achievementsUnlocked = false;
+    let xpGained = 0;
+    
+    // Helper function to unlock an achievement if it's not already unlocked
+    const unlockAchievement = (achievementId: string) => {
+      const achievement = achievements.find(a => a.id === achievementId);
+      if (achievement && !achievement.unlocked) {
+        achievement.unlocked = true;
+        achievement.unlockedAt = new Date();
+        achievementsUnlocked = true;
+        xpGained += achievement.xp;
+        
+        // Show achievement unlock animation
+        setUnlockedAchievement(achievement);
+        
+        // Log activity
+        logActivity({
+          id: Date.now().toString(),
+          type: 'achievement',
+          title: achievement.name,
+          description: achievement.description,
+          date: new Date().toISOString(),
+        });
+      }
+    };
+    
+    // Update progress for an achievement
+    const updateProgress = (achievementId: string, currentValue: number, totalValue: number) => {
+      const achievement = achievements.find(a => a.id === achievementId);
+      if (achievement && !achievement.unlocked) {
+        achievement.progress = currentValue;
+        achievement.total = totalValue;
+        
+        // If progress meets or exceeds the total, unlock the achievement
+        if (currentValue >= totalValue) {
+          unlockAchievement(achievementId);
+        }
+      }
+    };
+    
+    // Check for achievements based on type
+    if (user.userType === 1) { // Organization achievements
+      switch (achievementType) {
+        case 'initiative_signup':
+          unlockAchievement('o1'); // Initiative Innovator - Post your first initiative
+          break;
+        case 'initiative_complete':
+          unlockAchievement('o2'); // Mission Accomplished - Complete your first initiative
+          
+          // Check for multiple initiatives completed
+          const completedInitiatives = user.stats.initiativesCompleted || 0;
+          
+          // Update progress for multi-initiative achievements
+          updateProgress('o3', completedInitiatives, 5); // Impact Multiplier - Complete five initiatives
+          updateProgress('o6', completedInitiatives, 10); // Change Champion - Complete ten initiatives
+          updateProgress('o7', completedInitiatives, 50); // Impact Titan - Complete fifty initiatives
+          break;
+        case 'volunteer_capacity':
+          // Full House - Have five initiatives reach maximum volunteer capacity
+          const fullCapacityInitiatives = user.stats.fullCapacityInitiatives || 0;
+          updateProgress('o5', fullCapacityInitiatives, 5);
+          break;
+        case 'invite_friend':
+          // Volunteer Magnet - Recruit fifty volunteers to your initiatives
+          const volunteersRecruited = user.stats.volunteersEngaged || 0;
+          updateProgress('o4', volunteersRecruited, 50); // Volunteer Magnet - Recruit fifty volunteers
+          updateProgress('o8', volunteersRecruited, 100); // Community Catalyst - Recruit one-hundred volunteers
+          break;
+        case 'streak':
+          // Check streak achievements
+          const streak = user.stats.dailyStreak || 0;
+          updateProgress('o9', streak, 7); // Weekly Changemaker - Maintain a one-week streak
+          updateProgress('o10', streak, 30); // Monthly Mobilizer - Maintain a one-month streak
+          break;
+      }
+    } else { // Volunteer achievements
+      switch (achievementType) {
+        case 'initiative_signup':
+          unlockAchievement('v1'); // First Steps - Sign-up for your first initiative
+          break;
+        case 'initiative_complete':
+          unlockAchievement('v2'); // Impact Initiate - Complete your first initiative
+          
+          // Check for multiple initiatives completed
+          const completedInitiatives = user.stats.initiativesCompleted || 0;
+          
+          // Update progress for multi-initiative achievements
+          updateProgress('v3', completedInitiatives, 5); // Helping Hand - Complete five initiatives
+          updateProgress('v8', completedInitiatives, 10); // Dedicated Doer - Complete ten initiatives
+          updateProgress('v9', completedInitiatives, 50); // Volunteer Virtuoso - Complete fifty initiatives
+          break;
+        case 'volunteer_hours':
+          // Check volunteer hours achievements
+          const hours = user.stats.hoursVolunteered || 0;
+          updateProgress('v7', hours, 10); // Time Donor - Complete ten hours
+          updateProgress('v6', hours, 50); // Half-Century Hero - Complete fifty hours
+          updateProgress('v5', hours, 100); // Century Contributor - Complete one-hundred hours
+          break;
+        case 'impact_areas':
+          // Versatile Volunteer - Join volunteering initiatives in five different impact areas
+          const impactAreas = user.stats.impactAreas || 0;
+          updateProgress('v4', impactAreas, 5);
+          break;
+        case 'invite_friend':
+          // Community Connector - Invite a friend to volunteer
+          unlockAchievement('v10');
+          
+          // Network Nurturer - Invite three friends
+          const friendsInvited = user.stats.friendsInvited || 0;
+          updateProgress('v11', friendsInvited, 3);
+          break;
+        case 'streak':
+          // Check streak achievements
+          const streak = user.stats.dailyStreak || 0;
+          updateProgress('v12', streak, 7); // Weekly Warrior - Maintain a one-week streak
+          updateProgress('v13', streak, 30); // Monthly Maven - Maintain a one-month streak
+          break;
+      }
+    }
+    
+    // Update user stats if achievements were unlocked or progress was updated
+    if (achievementsUnlocked) {
+      if (user && user.id) {
+        updateUserStats(user.id, {
+          achievements,
+          xp: (user.xp || 0) + xpGained
+        });
+      }
     }
   };
 
@@ -1009,6 +1314,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         cancelSignUp,
         logActivity,
         showNotification,
+        forgotPassword,
+        resetPassword,
+        trackAchievementProgress,
       }}
     >
       {children}
@@ -1017,6 +1325,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           {...notification}
           isVisible={true}
           onClose={() => setNotification(null)}
+        />
+      )}
+      {unlockedAchievement && (
+        <AchievementUnlockAnimation
+          achievement={unlockedAchievement}
+          isVisible={true}
+          onClose={() => setUnlockedAchievement(null)}
         />
       )}
     </AuthContext.Provider>

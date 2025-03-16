@@ -42,6 +42,8 @@ import NoOpportunitiesCard from "./NoOpportunityCard";
 import useDebounce from "@/hooks/debounce";
 import { Filters } from "../components/explore-filters";
 import { InitiativeFilters } from "@/services/apiAction/initiative/types";
+import { ShareInitiative } from "../components/ShareInitiative";
+import { InitiativeReminder } from "../components/InitiativeReminder";
 
 interface Initiative {
   _id: string;
@@ -198,6 +200,7 @@ export default function ExplorePage() {
 
   const handleShare = useCallback(
     async (opportunity: any) => {
+      // We'll keep this for browsers that support the Web Share API
       try {
         await navigator.share({
           title: opportunity.title,
@@ -205,12 +208,12 @@ export default function ExplorePage() {
           url: window.location.href,
         });
       } catch (err) {
-        toast.success(
-          "The opportunity link has been copied to your clipboard."
-        );
+        // If Web Share API fails, we'll fall back to our ShareInitiative component
+        // which is handled by the UI
+        console.log("Web Share API not supported or failed");
       }
     },
-    [toast]
+    []
   );
 
   // const filteredOpportunities = opportunities.filter((opp) => {
@@ -344,42 +347,47 @@ export default function ExplorePage() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col space-y-8">
           {/* Header and Search */}
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-vollie-blue">
-                Welcome to Vollie
-              </h1>
-              <p className="mt-2 text-muted-foreground">
-                Volunteering for the Modern Era
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="w-full md:w-auto">
+              <div className="relative w-full md:w-96">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Search opportunities..."
+                  className="pl-10 w-full rounded-full border-vollie-blue/20 focus:border-vollie-blue"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground ml-3">
+                Discover opportunities that match your interests
               </p>
             </div>
-            {true && (
-              <Button
-                onClick={() => {
-                  toast(
-                    <div className="flex flex-col gap-2">
-                      <h3 className="text-lg font-semibold text-vollie-blue">Coming Soon!</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Users cannot create opportunities... Yet! Check back soon for new features to democratize volunteering!
-                      </p>
-                    </div>,
-                    {
-                      position: "bottom-right",
-                      autoClose: 5000,
-                      hideProgressBar: true,
-                      closeOnClick: true,
-                      pauseOnHover: true,
-                      draggable: true,
-                      className: "bg-card border border-border shadow-lg !text-foreground !bg-background"
-                    }
-                  );
-                }}
-                className="bg-vollie-blue hover:bg-vollie-blue/90 text-white"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Add Initiative
-              </Button>
-            )}
+            <Button
+              onClick={() => {
+                toast(
+                  <div className="flex flex-col gap-2">
+                    <h3 className="text-lg font-semibold text-vollie-blue">Coming Soon!</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Users cannot create opportunities... Yet! Check back soon for new features to democratize volunteering!
+                    </p>
+                  </div>,
+                  {
+                    position: "bottom-right",
+                    autoClose: 5000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    className: "bg-card border border-border shadow-lg !text-foreground !bg-background"
+                  }
+                );
+              }}
+              className="bg-vollie-blue hover:bg-vollie-blue/90 text-white rounded-full"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add Initiative
+            </Button>
           </div>
 
           {/* Main Content Area with Filters and Opportunities */}
@@ -388,16 +396,6 @@ export default function ExplorePage() {
             <div className="w-full md:w-80 flex-shrink-0">
               <div className="sticky top-24">
                 <div className="space-y-6">
-                  <div className="relative w-full">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      type="search"
-                      placeholder="Search opportunities..."
-                      className="pl-10 w-full"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                  </div>
                   <ExploreFilters
                     filters={filters}
                     setFilters={setFilters}
@@ -665,13 +663,25 @@ export default function ExplorePage() {
                           Log in to join initiatives
                         </Button>
                       )}
-                      <Button
-                        variant="outline"
-                        className="px-6"
-                        onClick={() => handleShare(selectedOpportunity)}
-                      >
-                        <Share2 className="h-5 w-5" />
-                      </Button>
+                      <div className="flex gap-2">
+                        <InitiativeReminder 
+                          initiative={{
+                            id: selectedOpportunity._id,
+                            title: selectedOpportunity.title,
+                            description: selectedOpportunity.description,
+                            startDate: selectedOpportunity.startDate,
+                            endDate: selectedOpportunity.endDate,
+                            location: selectedOpportunity.address
+                          }}
+                        />
+                        <ShareInitiative 
+                          initiative={{
+                            id: selectedOpportunity._id,
+                            title: selectedOpportunity.title,
+                            description: selectedOpportunity.description
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </motion.div>
