@@ -11,6 +11,8 @@ import { AchievementUnlockAnimation } from "../components/AchievementUnlockAnima
 import { cache, CACHE_KEYS } from "../lib/cache";
 import { request } from "@/services/api";
 import { endpoints } from "@/services/endpoints";
+import { LevelUpAnimation } from "../components/LevelUpAnimation";
+import { v4 as uuidv4 } from "uuid";
 
 type Achievement = {
   id: string;
@@ -150,6 +152,8 @@ type NotificationType = {
   description: string;
   xp?: number;
   achievement?: Achievement;
+  level?: number;
+  xpGained?: number;
 };
 
 type AuthContextType = {
@@ -208,6 +212,7 @@ type AuthContextType = {
   cancelSignUp: (initiativeId: string) => void;
   logActivity: (activity: Activity) => void;
   showNotification: (notification: NotificationType) => void;
+  addXp: (amount: number) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -452,6 +457,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState<NotificationType | null>(null);
   const [unlockedAchievement, setUnlockedAchievement] = useState<Achievement | null>(null);
+  const [showLevelUpNotification, setShowLevelUpNotification] = useState<{
+    isVisible: boolean;
+    level: number;
+    xpGained: number;
+    totalXp: number;
+  } | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -571,8 +582,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const showNotification = (notification: NotificationType) => {
-    setNotification(notification);
-    setTimeout(() => setNotification(null), 5000); // Hide after 5 seconds
+    if (notification.type === "levelUp" && notification.level && notification.xpGained) {
+      // Show level up animation
+      setShowLevelUpNotification({
+        isVisible: true,
+        level: notification.level,
+        xpGained: notification.xpGained,
+        totalXp: user?.xp || 0
+      });
+    } else if (notification.type === "achievement" && notification.achievement) {
+      // Show achievement notification
+      setNotification(notification);
+      setTimeout(() => setNotification(null), 5000); // Hide after 5 seconds
+    }
   };
 
   const getUserAchievements = (userId: string) => {
@@ -1279,6 +1301,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  // Add XP to user and check for level up
+  const addXp = (amount: number) => {
+    if (!user) return;
+    
+    const currentXp = user.xp || 0;
+    const newXp = currentXp + amount;
+    
+    const currentLevel = calculateLevel(currentXp);
+    const newLevel = calculateLevel(newXp);
+    
+    // Update user with new XP
+    const updatedUser = {
+      ...user,
+      xp: newXp,
+      level: newLevel
+    };
+    
+    setUser(updatedUser);
+    
+    // Check if user leveled up
+    if (newLevel > currentLevel) {
+      // Show level up notification
+      showNotification({
+        type: "levelUp",
+        title: "Level Up!",
+        description: `Congratulations! You've reached Level ${newLevel}!`,
+        xp: amount,
+        level: newLevel,
+        xpGained: amount
+      });
+      
+      // Log activity
+      logActivity({
+        id: uuidv4(),
+        type: 'achievement',
+        title: 'Level Up',
+        description: `Reached Level ${newLevel}`,
+        date: new Date().toISOString()
+      });
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -1317,6 +1381,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         forgotPassword,
         resetPassword,
         trackAchievementProgress,
+        addXp
       }}
     >
       {children}
@@ -1332,6 +1397,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           achievement={unlockedAchievement}
           isVisible={true}
           onClose={() => setUnlockedAchievement(null)}
+        />
+      )}
+      {showLevelUpNotification && (
+        <LevelUpAnimation
+          isVisible={showLevelUpNotification.isVisible}
+          onClose={() => setShowLevelUpNotification(null)}
+          level={showLevelUpNotification.level}
+          userType={user?.userType === 2 ? 'volunteer' : 'organization'}
+          xpGained={showLevelUpNotification.xpGained}
+          totalXp={showLevelUpNotification.totalXp}
         />
       )}
     </AuthContext.Provider>
