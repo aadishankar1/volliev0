@@ -285,19 +285,9 @@ export function LevelUpAnimation({
                   ) : (
                     <>
                       <li className="flex items-start gap-2">
-                        <TrendingUp className="h-4 w-4 text-vollie-green mt-0.5" />
-                        <span>Increased visibility in search results</span>
-                      </li>
-                      <li className="flex items-start gap-2">
                         <Star className="h-4 w-4 text-vollie-green mt-0.5" />
                         <span>New profile badge: Level {level} Organization</span>
                       </li>
-                      {level >= 3 && (
-                        <li className="flex items-start gap-2">
-                          <Zap className="h-4 w-4 text-vollie-green mt-0.5" />
-                          <span>Unlocked featured placement on the explore page</span>
-                        </li>
-                      )}
                     </>
                   )}
                 </ul>
